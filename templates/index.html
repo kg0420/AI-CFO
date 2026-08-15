@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>aiCFO — New Ledger Entry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEDDF;
+    --paper-card:#FBFAF2;
+    --line:#C9D4BE;
+    --line-soft:#DDE4D2;
+    --ink:#20301F;
+    --ink-soft:#57644F;
+    --ink-faint:#8B9682;
+    --stamp:#A5382B;
+    --stamp-dim:#c17569;
+    --brass:#A9822F;
+    --forest:#20402F;
+    --forest-dark:#152B20;
+    --mint:#5F7A5A;
+    --shadow: rgba(32,48,31,0.22);
+    --focus: #A9822F;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+    font-family:'Work Sans', sans-serif;
+    color:var(--ink);
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(to bottom, transparent 0 30px, var(--line-soft) 30px 31px),
+      radial-gradient(1200px 600px at 15% -10%, rgba(169,130,47,0.08), transparent 60%),
+      radial-gradient(900px 500px at 110% 110%, rgba(165,56,43,0.06), transparent 55%);
+    position:relative;
+  }
+
+  /* faint paper grain */
+  body::after{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none;
+    opacity:0.35;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  .stage{
+    position:relative;
+    width:100%;
+    max-width:460px;
+  }
+
+  /* margin rule — classic ledger red vertical line */
+  .stage::before{
+    content:"";
+    position:absolute;
+    left:44px; top:26px; bottom:26px;
+    width:1px;
+    background:linear-gradient(to bottom, transparent, var(--stamp-dim) 8%, var(--stamp-dim) 92%, transparent);
+    opacity:0.35;
+    z-index:0;
+  }
+
+  /* ---------- folder tabs ---------- */
+  .tabs{
+    display:flex;
+    position:relative;
+    z-index:2;
+    padding:0 18px;
+    margin-bottom:-1px;
+  }
+  .tab{
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.09em;
+    font-weight:600;
+    text-transform:uppercase;
+    padding:11px 20px 16px;
+    color:var(--ink-faint);
+    background:#DFDBC7;
+    clip-path:polygon(10% 0, 100% 0, 92% 100%, 0% 100%);
+    transition:color .25s ease, background .25s ease, transform .2s ease;
+    transform:translateY(4px);
+  }
+  .tab + .tab{ margin-left:-14px; }
+  .tab:hover{ color:var(--ink); }
+  .tab.active{
+    background:var(--paper-card);
+    color:var(--stamp);
+    transform:translateY(0);
+    box-shadow:0 -2px 6px rgba(32,48,31,0.06);
+  }
+  .tab:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+
+  /* ---------- card ---------- */
+  .card{
+    position:relative;
+    z-index:1;
+    background:var(--paper-card);
+    padding:38px 30px 28px;
+    box-shadow:0 18px 40px -12px var(--shadow), 0 2px 0 rgba(0,0,0,0.03);
+    border-radius:3px;
+  }
+  .card::before, .card::after{
+    content:"";
+    position:absolute; left:0; right:0; height:16px;
+    background-image:radial-gradient(circle at 10px 8px, var(--paper) 9px, transparent 9.5px);
+    background-size:20px 18px;
+    background-repeat:repeat-x;
+  }
+  .card::before{ top:-9px; }
+  .card::after{ bottom:-9px; transform:scaleY(-1); }
+
+  /* stamp badge */
+  .stamp{
+    position:absolute;
+    top:-16px; right:14px;
+    width:82px; height:82px;
+    border-radius:50%;
+    border:2.5px solid var(--stamp);
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    color:var(--stamp);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9px;
+    font-weight:600;
+    letter-spacing:0.05em;
+    line-height:1.3;
+    text-transform:uppercase;
+    transform:rotate(-14deg) scale(1.5);
+    opacity:0;
+    mix-blend-mode:multiply;
+    z-index:3;
+    animation:stampDown .55s .35s cubic-bezier(.2,1.4,.4,1) forwards;
+  }
+  .stamp::before{
+    content:"";
+    position:absolute; inset:5px;
+    border:1px solid var(--stamp);
+    border-radius:50%;
+    opacity:0.6;
+  }
+  @keyframes stampDown{
+    0%{ opacity:0; transform:rotate(-14deg) scale(1.9); }
+    60%{ opacity:0.85; }
+    100%{ opacity:0.85; transform:rotate(-14deg) scale(1); }
+  }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--brass);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size:clamp(24px, 5.5vw, 29px);
+    margin:0 0 6px;
+    color:var(--ink);
+  }
+  h1 em{ color:var(--stamp); font-style:italic; }
+  .sub{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin:0 0 26px;
+    line-height:1.5;
+    max-width:34ch;
+  }
+
+  /* ---------- dropzone ---------- */
+  .dropzone{
+    position:relative;
+    border:1.5px dashed var(--line);
+    border-radius:4px;
+    padding:26px 16px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .25s ease, background .25s ease;
+    background:linear-gradient(var(--paper-card), var(--paper-card));
+    overflow:hidden;
+  }
+  .dropzone.drag{
+    border-color:var(--stamp);
+    background:#F7EEE9;
+  }
+  .dropzone .scan{
+    position:absolute; left:0; right:0; top:0; height:2px;
+    background:linear-gradient(90deg, transparent, var(--stamp), transparent);
+    opacity:0;
+  }
+  .dropzone.drag .scan{
+    opacity:1;
+    animation:scanline 1.1s linear infinite;
+  }
+  @keyframes scanline{
+    0%{ top:0; }
+    100%{ top:100%; }
+  }
+  .dz-icon{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:22px;
+    display:block;
+    margin-bottom:8px;
+    color:var(--ink-faint);
+    transition:transform .25s ease;
+  }
+  .dropzone.drag .dz-icon{ transform:translateY(-3px); color:var(--stamp); }
+  .dz-title{ font-weight:600; font-size:13.5px; margin-bottom:2px; }
+  .dz-hint{ font-size:11.5px; color:var(--ink-faint); }
+  .dropzone input[type=file]{
+    position:absolute; inset:0; opacity:0; cursor:pointer;
+  }
+
+  .chips{
+    display:flex; flex-wrap:wrap; gap:6px;
+    margin-top:12px;
+  }
+  .chip{
+    display:flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    padding:5px 8px 5px 10px;
+    border-radius:20px;
+    color:var(--ink-soft);
+    animation:chipIn .25s ease both;
+  }
+  @keyframes chipIn{ from{opacity:0; transform:translateY(4px) scale(.95);} to{opacity:1; transform:none;} }
+  .chip button{
+    all:unset; cursor:pointer; color:var(--stamp); font-weight:700; line-height:1;
+    padding:0 2px;
+  }
+
+  /* ---------- form fields ---------- */
+  .field{ margin-bottom:18px; }
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:7px;
+  }
+  .field input[type=text],
+  .field input[type=date],
+  .field select{
+    width:100%;
+    border:none;
+    border-bottom:1.5px solid var(--line);
+    background:transparent;
+    padding:7px 2px 9px;
+    font-family:'Work Sans', sans-serif;
+    font-size:14.5px;
+    color:var(--ink);
+    transition:border-color .2s ease;
+  }
+  .field input:focus, .field select:focus{
+    outline:none;
+    border-bottom-color:var(--stamp);
+  }
+  .field input::placeholder{ color:var(--ink-faint); }
+
+  .amount-wrap{ position:relative; }
+  .amount-wrap .rupee{
+    position:absolute; left:2px; bottom:9px;
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--ink-faint);
+    font-size:14.5px;
+  }
+  .amount-wrap input{ padding-left:18px !important; font-family:'IBM Plex Mono', monospace; }
+
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+  .field select{
+    appearance:none;
+    -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2357644F'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 4px center;
+    padding-right:16px;
+  }
+
+  /* ---------- submit ---------- */
+  .submit{
+    width:100%;
+    border:none;
+    cursor:pointer;
+    padding:14px 18px;
+    border-radius:4px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    font-weight:600;
+    color:#F3F1E3;
+    background:var(--forest);
+    position:relative;
+    overflow:hidden;
+    transition:background .25s ease, transform .1s ease;
+    margin-top:6px;
+  }
+  .submit.dark{ background:var(--ink); }
+  .submit:hover{ background:var(--forest-dark); }
+  .submit:active{ transform:scale(.985); }
+  .submit:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+  .submit::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(100deg, transparent 40%, rgba(255,255,255,0.14) 50%, transparent 60%);
+    transform:translateX(-120%);
+  }
+  .submit:hover::after{ transform:translateX(120%); transition:transform .7s ease; }
+
+  .footnote{
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px dashed var(--line);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    color:var(--ink-faint);
+    display:flex;
+    justify-content:space-between;
+    letter-spacing:0.03em;
+  }
+
+  .hidden{ display:none !important; }
+
+  @media (max-width:400px){
+    .card{ padding:32px 20px 24px; }
+    .grid2{ grid-template-columns:1fr; gap:0; }
+    .stage::before{ left:24px; }
+    .stamp{ width:68px; height:68px; font-size:8px; top:-12px; right:8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="stage">
+    <div class="tabs">
+      <button type="button" class="tab active" id="ocrTab" onclick="switchTab('ocr')">📎 Scan Receipt</button>
+      <button type="button" class="tab" id="manualTab" onclick="switchTab('manual')">🖊 Write In</button>
+    </div>
+
+    <div class="card">
+      <div class="stamp">AI<br>Verified<br>Ledger</div>
+
+      <div class="eyebrow"><span>aiCFO Ledger</span><span>№ 0138</span></div>
+
+      <!-- OCR FORM -->
+      <form id="ocrForm" action="/generate-report" method="POST" enctype="multipart/form-data">
+        <h1>Drop in a <em>receipt</em>,<br>get a report.</h1>
+        <p class="sub">Upload one or more photos — aiCFO reads the totals, dates and merchants for you.</p>
+
+        <label class="dropzone" id="dropzone" for="fileInput">
+          <span class="scan"></span>
+          <span class="dz-icon">⌸</span>
+          <span class="dz-title">Drag receipts here, or tap to browse</span>
+          <span class="dz-hint">JPG, PNG · any number of files</span>
+          <input type="file" id="fileInput" name="receipts" multiple accept="image/*" required>
+        </label>
+
+        <div class="chips" id="chipList"></div>
+
+        <button type="submit" class="submit" style="margin-top:22px;">Analyze &amp; Generate Report</button>
+
+        <div class="footnote"><span>Encrypted upload</span><span>Avg. read time 8s</span></div>
+      </form>
+
+      <!-- MANUAL FORM -->
+      <form id="manualForm" action="/add-manual-expense" method="POST" class="hidden">
+        <h1>Faded receipt?<br><em>Write it in.</em></h1>
+        <p class="sub">Enter the details by hand and we'll slot it into the ledger.</p>
+
+        <div class="field">
+          <label for="merchant_name">Merchant</label>
+          <input type="text" id="merchant_name" name="merchant_name" required placeholder="e.g. Target, Shell">
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="expense_date">Date</label>
+            <input type="date" id="expense_date" name="expense_date" required>
+          </div>
+          <div class="field">
+            <label for="grand_total">Amount</label>
+            <div class="amount-wrap">
+              <span class="rupee">₹</span>
+              <input type="number" step="0.01" id="grand_total" name="grand_total" required placeholder="0.00">
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" name="category">
+            <option value="Office Supplies">Office Supplies</option>
+            <option value="Meals & Entertainment">Meals &amp; Entertainment</option>
+            <option value="Travel & Transport">Travel &amp; Transport</option>
+            <option value="Utilities">Utilities</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <input type="text" id="description" name="description" placeholder="Optional notes — e.g. faded ink">
+        </div>
+
+        <button type="submit" class="submit dark">Save Manual Entry</button>
+
+        <div class="footnote"><span>Manual entry</span><span>Logged instantly</span></div>
+      </form>
+    </div>
+  </div>
+
+<script>
+  function switchTab(tab){
+    const ocrForm = document.getElementById('ocrForm');
+    const manualForm = document.getElementById('manualForm');
+    const ocrTab = document.getElementById('ocrTab');
+    const manualTab = document.getElementById('manualTab');
+
+    if(tab === 'ocr'){
+      ocrForm.classList.remove('hidden');
+      manualForm.classList.add('hidden');
+      ocrTab.classList.add('active');
+      manualTab.classList.remove('active');
+    } else {
+      ocrForm.classList.add('hidden');
+      manualForm.classList.remove('hidden');
+      manualTab.classList.add('active');
+      ocrTab.classList.remove('active');
+    }
+  }
+
+  // Drag & drop + file chip preview for the OCR form
+  (function(){
+    const dropzone = document.getElementById('dropzone');
+    const input = document.getElementById('fileInput');
+    const chipList = document.getElementById('chipList');
+    let files = [];
+
+    function render(){
+      chipList.innerHTML = '';
+      files.forEach((file, i) => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.style.animationDelay = (i * 0.04) + 's';
+        const name = file.name.length > 18 ? file.name.slice(0,15) + '…' : file.name;
+        chip.innerHTML = '<span>' + name + '</span>';
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.textContent = '×';
+        remove.setAttribute('aria-label', 'Remove ' + file.name);
+        remove.addEventListener('click', (e) => {
+          e.preventDefault();
+          files.splice(i, 1);
+          syncInput();
+          render();
+        });
+        chip.appendChild(remove);
+        chipList.appendChild(chip);
+      });
+    }
+
+    function syncInput(){
+      const dt = new DataTransfer();
+      files.forEach(f => dt.items.add(f));
+      input.files = dt.files;
+    }
+
+    input.addEventListener('change', () => {
+      files = Array.from(input.files);
+      render();
+    });
+
+    ['dragenter','dragover'].forEach(evt => {
+      dropzone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        dropzone.classList.add('drag');
+      });
+    });
+    ['dragleave','dragend'].forEach(evt => {
+      dropzone.addEventListener(evt, () => dropzone.classList.remove('drag'));
+    });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('drag');
+      const dropped = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+      files = files.concat(dropped);
+      syncInput();
+      render();
+    });
+  })();
+</script>
+
+</body>
+</html>

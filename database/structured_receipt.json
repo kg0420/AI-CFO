@@ -1,0 +1,22 @@
+{
+    "ocr_text": "Tax Invoice\n9431311286\nInvoice Number: I0624KO001873338\nPacketID: 9431311286\nOrder Number: 1242843-0942048-8479201\nInvoice Date: 02 Aug 2023\nNature of Transaction: Inter-State\nOrder Date: 02 Aug 2023\nPlace of Supply: KARNATAKA\nNature of Supply: Goods\nBill to / Ship to:\nChahat Verma\n#16,17, Sri Smt Bhagyamma building, E1, 5th floor, 1st cross, Kaveri Customer Type: Unregistered\nlayout Marathahalli Colony Bengaluru - 560037 KA, India\nBill From:\nShip From:\nKonde Products & Services Private Limited\nEmbassy Industrial Park,Village Pathredi ,Taoru Road, Gurgaon ,\nEmbassy Industrial Park,Village Pathredi ,Taoru Road, Gurgaon,\nHaryana, Bhiwadi, Haryana-122413\nGSTIN Number: 06AAGCK4304E2ZY\nGross\nOther\nTaxable\nSGST/\nQty\nDiscount\nCGST\nIGST\nCharges\nCess Total Amount\nAmount\nUGST\nTOKYJENS45405176 - Tokyo Talkies Women Blue Flared High-Rise Clean Look Jeans, Size: 30\nHSN: 62046200, 5.0% IGST\nRs 1899.00 Rs 1349.00\nRs 0.00\nRs 523.81\nRs 26.19\nRs 550.00\nTOTAL\nAuthorized Signatory\nDECLARATION\nThe goods sold as part of this shipment are intended for end-user consumption and are not for retail sale\nReg Address: Konde Products & Services Private Limited,3rd floor, No. 1185,5th Main, 7th sector HSR layout,, Obeya\nPurchase made on\nTranquil, Bengaluru, Bengaluru Urban,, Bengaluru, KARNATAKA-560102\nIf you have any questions, feel free to call customer care at +91 80 6156 1999 or use Contact Us section in our App,\nor log on to www.myntra.com/ contactus\nMyntra",
+    "vendor_name": null,
+    "invoice_number": null,
+    "subtotal": 0.0,
+    "tax": 0.0,
+    "total": 0.0,
+    "line_items": [
+        {
+            "item_id_or_sku": "TOKYJENS45405176",
+            "description": "Tokyo Talkies Women Blue Flared High-Rise Clean Look Jeans, Size: 30",
+            "hsn_sac_code": "62046200",
+            "quantity": 5.0,
+            "unit_price": 1899.0,
+            "discount_amount": 0.0,
+            "taxable_value": 1349.0,
+            "tax_percentage": 5.0,
+            "tax_amount": 550.0,
+            "total_item_amount": 1899.0
+        }
+    ]
+}

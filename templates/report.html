@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>aiCFO — Financial Analysis Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEDDF;
+    --paper-card:#FBFAF2;
+    --line:#D8DECB;
+    --line-strong:#C3CBB4;
+    --ink:#20301F;
+    --ink-soft:#57644F;
+    --ink-faint:#8B9682;
+    --stamp:#A5382B;
+    --stamp-tint:#F4E7E3;
+    --brass:#A9822F;
+    --brass-tint:#F2ECD9;
+    --forest:#20402F;
+    --forest-dark:#152B20;
+    --shadow: rgba(32,48,31,0.14);
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(to bottom, transparent 0 30px, #E4E2D2 30px 31px),
+      radial-gradient(1100px 500px at 10% -10%, rgba(169,130,47,0.07), transparent 55%);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    padding:32px 16px 64px;
+  }
+
+  .sheet{
+    max-width:920px;
+    margin:0 auto;
+    background:var(--paper-card);
+    border-radius:4px;
+    box-shadow:0 18px 44px -18px var(--shadow);
+    padding:clamp(24px, 4vw, 56px);
+    position:relative;
+  }
+  .sheet::before, .sheet::after{
+    content:"";
+    position:absolute; left:0; right:0; height:16px;
+    background-image:radial-gradient(circle at 10px 8px, var(--paper) 9px, transparent 9.5px);
+    background-size:20px 18px;
+    background-repeat:repeat-x;
+  }
+  .sheet::before{ top:-9px; }
+  .sheet::after{ bottom:-9px; transform:scaleY(-1); }
+
+  /* ---------- header ---------- */
+  .head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    flex-wrap:wrap;
+    border-bottom:1.5px solid var(--line-strong);
+    padding-bottom:22px;
+    margin-bottom:34px;
+  }
+  .head .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:8px;
+  }
+  .head h1{
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size:clamp(24px, 4vw, 32px);
+    margin:0;
+    color:var(--ink);
+  }
+  .head .meta{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-faint);
+    margin-top:8px;
+  }
+
+  .export-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--forest);
+    color:#F3F1E3;
+    border:none;
+    cursor:pointer;
+    padding:11px 18px;
+    border-radius:4px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    font-weight:600;
+    transition:background .2s ease, transform .1s ease;
+  }
+  .export-btn:hover{ background:var(--forest-dark); }
+  .export-btn:active{ transform:scale(.98); }
+  .export-btn svg{ width:15px; height:15px; }
+
+  /* ---------- section framing ---------- */
+  section{ margin-bottom:42px; }
+  .section-title{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .section-title .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    color:var(--brass);
+    background:var(--brass-tint);
+    padding:3px 7px;
+    border-radius:3px;
+  }
+  .section-title h2{
+    font-family:'Spectral', serif;
+    font-size:19px;
+    font-weight:600;
+    margin:0;
+    color:var(--ink);
+  }
+
+  /* ---------- charts ---------- */
+  .chart-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+  }
+  .chart-box{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:14px;
+    overflow:hidden;
+    break-inside:avoid;
+    page-break-inside:avoid;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .chart-box.wide{ grid-column:1 / -1; }
+  .chart-box .exhibit{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-bottom:6px;
+    flex:none;
+  }
+  /* The chart itself lives in here. We give it a real, stable height and
+     let Plotly/Chart.js manage their own internal SVG layers — forcing
+     width/height on those nested layers (as a previous version of this
+     file did) breaks their layered layout and makes titles/legends overlap
+     the plot. We only size this outer box; the library resizes to fit it. */
+  .chart-inner{
+    width:100%;
+    height:340px;
+    flex:1;
+  }
+  .chart-inner > div{ width:100% !important; height:100% !important; }
+
+  /* ---------- recommendations ---------- */
+  .rec-panel{
+    background:var(--stamp-tint);
+    border:1px solid #E5CDC7;
+    border-left:3px solid var(--stamp);
+    border-radius:3px;
+    padding:22px 24px;
+  }
+  .rec-panel ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  .rec-panel li{
+    display:flex; align-items:flex-start; gap:12px;
+    font-size:14px; color:var(--ink);
+    line-height:1.5;
+  }
+  .rec-panel .n{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    font-weight:600;
+    color:var(--stamp);
+    background:#fff;
+    border:1px solid #E5CDC7;
+    border-radius:50%;
+    width:20px; height:20px;
+    flex:none;
+    display:flex; align-items:center; justify-content:center;
+    margin-top:1px;
+  }
+
+  /* ---------- ledger table ---------- */
+  .ledger-wrap{
+    border:1px solid var(--line-strong);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  table{ width:100%; border-collapse:collapse; }
+  thead th{
+    text-align:left;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    background:var(--paper);
+    padding:11px 16px;
+    border-bottom:1px solid var(--line-strong);
+  }
+  thead th.num{ text-align:right; }
+  tbody td{
+    padding:11px 16px;
+    font-size:13.5px;
+    color:var(--ink);
+    border-bottom:1px solid var(--line);
+  }
+  tbody tr:nth-child(even) td{ background:#F6F4E8; }
+  tbody td.num{
+    text-align:right;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:500;
+  }
+  tfoot td{
+    padding:12px 16px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    border-top:1.5px solid var(--line-strong);
+    background:var(--brass-tint);
+  }
+  tfoot td.num{ text-align:right; }
+
+  /* ---------- chat ---------- */
+  .chat-panel{
+    background:var(--paper-card);
+    border:1px solid var(--line-strong);
+    border-radius:4px;
+    padding:20px;
+  }
+  .chat-panel h3{
+    font-family:'Spectral', serif;
+    font-size:16px;
+    margin:0 0 14px;
+    color:var(--ink);
+  }
+  #chat-history{
+    height:230px;
+    overflow-y:auto;
+    padding:14px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:4px;
+    display:flex; flex-direction:column; gap:10px;
+    margin-bottom:14px;
+    font-size:13.5px;
+  }
+  #chat-history .placeholder{
+    font-size:12.5px; font-style:italic; color:var(--ink-faint);
+  }
+  .msg{ padding:9px 13px; border-radius:6px; max-width:82%; line-height:1.45; }
+  .msg.user{ align-self:flex-end; background:var(--brass-tint); color:var(--ink); }
+  .msg.ai{ align-self:flex-start; background:#fff; border:1px solid var(--line); color:var(--ink); }
+  .msg.err{ color:var(--stamp); font-size:12.5px; }
+  .msg b{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.04em; display:block; margin-bottom:3px; text-transform:uppercase; color:var(--ink-faint); }
+
+  .chat-row{ display:flex; gap:8px; }
+  .chat-row input{
+    flex:1;
+    border:1.5px solid var(--line-strong);
+    border-radius:4px;
+    padding:10px 12px;
+    font-family:'Work Sans', sans-serif;
+    font-size:13.5px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .chat-row input:focus{ outline:none; border-color:var(--stamp); }
+  .chat-row button{
+    background:var(--ink);
+    color:#F3F1E3;
+    border:none;
+    padding:10px 18px;
+    border-radius:4px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:background .2s ease;
+  }
+  .chat-row button:hover{ background:var(--forest-dark); }
+
+  /* ---------- print ---------- */
+  @media print {
+    body{
+      background:#fff !important;
+      padding:0;
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+    }
+    .sheet{ box-shadow:none; max-width:100%; padding:12px; }
+    .sheet::before, .sheet::after{ display:none; }
+    .no-print{ display:none !important; }
+    .page-break{ page-break-before:always; }
+    section{ margin-bottom:28px; }
+
+    /* the actual fix for charts not showing on export:
+       1) never let a chart's box collapse, clip, or get split across a page
+       2) size only the OUTER chart-inner wrapper — the library (Plotly/
+          Chart.js) manages its own nested SVG layers, and overriding those
+          directly is what caused titles/legends to overlap the plot
+       3) force exact color rendering on every chart element, not just body
+       4) resizeChartsForPrint() (see script) fires just before printing so
+          each chart actually redraws at this printable size */
+    .chart-grid{ grid-template-columns:1fr 1fr; gap:12px; }
+    .chart-box{
+      overflow:hidden;
+      break-inside:avoid;
+      page-break-inside:avoid;
+      min-height:280px;
+    }
+    .chart-box, .chart-box *{
+      -webkit-print-color-adjust:exact !important;
+      print-color-adjust:exact !important;
+    }
+    .chart-inner{ height:280px; }
+    .chart-inner > div{ width:100% !important; height:100% !important; }
+  }
+
+  @media (max-width:640px){
+    .chart-grid{ grid-template-columns:1fr; }
+    .head{ flex-direction:column; }
+    .export-btn{ width:100%; justify-content:center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <!-- Header -->
+  <div class="head">
+    <div>
+      <div class="eyebrow">aiCFO · Ledger Report</div>
+      <h1>Financial Analysis Report</h1>
+      <div class="meta" id="report-date">Generated —</div>
+    </div>
+    <button onclick="preparePrint()" class="no-print export-btn">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+      Export PDF
+    </button>
+  </div>
+
+  <!-- Visualizations -->
+  <section>
+    <div class="section-title">
+      <span class="tag">FIN-01</span>
+      <h2>Financial Visualizations</h2>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-box">
+        <div class="exhibit">Exhibit A · Spend by Category</div>
+        <div class="chart-inner">{{ graph_donut | safe }}</div>
+      </div>
+
+      <div class="chart-box">
+        <div class="exhibit">Exhibit B · Spend by Vendor</div>
+        <div class="chart-inner">{{ graph_vendor | safe }}</div>
+      </div>
+
+      <div class="chart-box wide">
+        <div class="exhibit">Exhibit C · Spend Over Time</div>
+        <div class="chart-inner">{{ graph_timeline | safe }}</div>
+      </div>
+
+      <div class="chart-box">
+        <div class="exhibit">Exhibit D · Tax Breakdown</div>
+        <div class="chart-inner">{{ graph_tax | safe }}</div>
+      </div>
+
+      <div class="chart-box">
+        <div class="exhibit">Exhibit E · Category Treemap</div>
+        <div class="chart-inner">{{ graph_treemap | safe }}</div>
+      </div>
+
+      <div class="chart-box wide">
+        <div class="exhibit">Exhibit F · Data Source Breakdown</div>
+        <div class="chart-inner">{{ graph_source | safe }}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recommendations -->
+  <section>
+    <div class="section-title">
+      <span class="tag">FIN-02</span>
+      <h2>Strategic Recommendations</h2>
+    </div>
+    <div class="rec-panel">
+      <ul>
+        {% for suggestion in suggestions %}
+        <li><span class="n">{{ loop.index }}</span><span>{{ suggestion }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Ledger table -->
+  <section class="page-break">
+    <div class="section-title">
+      <span class="tag">FIN-03</span>
+      <h2>Extracted Ledger</h2>
+    </div>
+    <div class="ledger-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Item Description</th>
+            <th class="num">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in expenses %}
+          <tr>
+            <td>{{ item.item_description }}</td>
+            <td class="num">₹{{ "%.2f"|format(item.amount) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Total</td>
+            <td class="num">₹{{ "%.2f"|format(expenses|sum(attribute='amount')) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+  <!-- Chat -->
+  <div class="chat-panel no-print">
+    <h3>💬 Ask Your AI CFO</h3>
+    <div id="chat-history">
+      <div class="placeholder">Example: "What was my biggest expense this month?"</div>
+    </div>
+    <div class="chat-row">
+      <input type="text" id="chat-input" placeholder="Ask about your finances...">
+      <button onclick="sendMessage()">Ask</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.getElementById('report-date').textContent =
+    'Generated ' + new Date().toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric' });
+
+  // ---- Print fix: charts (Plotly/Chart.js/plain SVG) are drawn once at
+  // screen size and don't automatically redraw when print CSS changes the
+  // layout width. Force a resize/relayout right before the print dialog
+  // opens so every chart redraws at its printable size instead of showing
+  // blank, clipped, or stretched.
+  function resizeChartsForPrint(){
+    if (window.Plotly) {
+      document.querySelectorAll('.plotly-graph-div').forEach(function(gd){
+        try { Plotly.Plots.resize(gd); } catch(e) {}
+      });
+    }
+    if (window.Chart && Chart.instances) {
+      Object.values(Chart.instances).forEach(function(c){
+        try { c.resize(); } catch(e) {}
+      });
+    }
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  function preparePrint(){
+    resizeChartsForPrint();
+    // give the redraw a tick to paint before the print dialog captures the page
+    setTimeout(function(){ window.print(); }, 150);
+  }
+
+  window.addEventListener('beforeprint', resizeChartsForPrint);
+
+  async function sendMessage() {
+    const inputField = document.getElementById('chat-input');
+    const message = inputField.value.trim();
+    if (!message) return;
+
+    const chatHistory = document.getElementById('chat-history');
+
+    chatHistory.innerHTML += `
+      <div class="msg user"><b>You</b>${message}</div>
+    `;
+    inputField.value = '';
+
+    const loadingId = 'loading-' + Date.now();
+    chatHistory.innerHTML += `
+      <div id="${loadingId}" class="placeholder">AI CFO is analyzing your ledger...</div>
+    `;
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message })
+      });
+
+      const data = await response.json();
+      document.getElementById(loadingId).remove();
+
+      if (response.ok) {
+        chatHistory.innerHTML += `
+          <div class="msg ai"><b>AI CFO</b>${data.reply}</div>
+        `;
+      } else {
+        chatHistory.innerHTML += `<div class="msg err">Error: ${data.error}</div>`;
+      }
+    } catch (error) {
+      document.getElementById(loadingId).remove();
+      chatHistory.innerHTML += `<div class="msg err">Connection error.</div>`;
+    }
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  }
+
+  document.getElementById('chat-input').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') sendMessage();
+  });
+</script>
+
+</body>
+</html>

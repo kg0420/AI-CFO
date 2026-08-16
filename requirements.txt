@@ -11,7 +11,10 @@ bcrypt
 plotly
 
 groq
+
+paddlepaddle
 paddleocr
+
 python-dotenv
 google-genai
 gunicorn

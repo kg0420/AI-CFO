@@ -3,76 +3,565 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI CFO - Authentication</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>aiCFO — Your Financial Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #EFEDDF;
+            --paper-card: #FBFAF2;
+            --line: #C9D4BE;
+            --line-soft: #DDE4D2;
+            --ink: #20301F;
+            --ink-soft: #57644F;
+            --ink-faint: #8B9682;
+            --stamp: #A5382B;
+            --stamp-dim: #c17569;
+            --brass: #A9822F;
+            --forest: #20402F;
+            --forest-dark: #152B20;
+            --mint: #5F7A5A;
+            --shadow: rgba(32,48,31,0.22);
+            --focus: #A9822F;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 16px;
+            font-family: 'Work Sans', sans-serif;
+            color: var(--ink);
+            background-color: var(--paper);
+            background-image:
+                repeating-linear-gradient(to bottom, transparent 0 30px, var(--line-soft) 30px 31px),
+                radial-gradient(1000px 500px at 10% -10%, rgba(169,130,47,.10), transparent 60%),
+                radial-gradient(800px 500px at 100% 100%, rgba(165,56,43,.07), transparent 60%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .30;
+            mix-blend-mode: multiply;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        .floating {
+            position: fixed;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-faint);
+            opacity: .35;
+            pointer-events: none;
+            white-space: nowrap;
+            animation: float 8s ease-in-out infinite;
+        }
+        .float-1 { top: 16%; left: 7%; animation-delay: 0s; }
+        .float-2 { top: 27%; right: 7%; animation-delay: 2s; }
+        .float-3 { bottom: 20%; left: 8%; animation-delay: 4s; }
+        .float-4 { bottom: 13%; right: 10%; animation-delay: 1s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .stage {
+            position: relative;
+            width: 100%;
+            max-width: 470px;
+            animation: pageEnter .8s cubic-bezier(.2,.8,.2,1);
+        }
+
+        @keyframes pageEnter {
+            from { opacity: 0; transform: translateY(25px) scale(.97); }
+            to { opacity: 1; transform: none; }
+        }
+
+        .stage::before {
+            content: "";
+            position: absolute;
+            left: 42px;
+            top: 22px;
+            bottom: 22px;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, var(--stamp-dim) 8%, var(--stamp-dim) 92%, transparent);
+            opacity: .4;
+            z-index: 0;
+            animation: lineReveal 1.2s ease .3s both;
+        }
+
+        @keyframes lineReveal {
+            from { transform: scaleY(0); transform-origin: center; }
+            to { transform: scaleY(1); }
+        }
+
+        .card {
+            position: relative;
+            z-index: 2;
+            background: var(--paper-card);
+            padding: 38px 34px 28px;
+            box-shadow: 0 25px 60px -20px var(--shadow), 0 2px 0 rgba(0,0,0,.03);
+            border-radius: 3px;
+        }
+
+        .card::before, .card::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 16px;
+            background-image: radial-gradient(circle at 10px 8px, var(--paper) 9px, transparent 9.5px);
+            background-size: 20px 18px;
+            background-repeat: repeat-x;
+        }
+        .card::before { top: -9px; }
+        .card::after { bottom: -9px; transform: scaleY(-1); }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 18px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #5F7A5A;
+            box-shadow: 0 0 0 0 rgba(95,122,90,.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(95,122,90,.5); }
+            70% { box-shadow: 0 0 0 7px rgba(95,122,90,0); }
+            100% { box-shadow: 0 0 0 0 rgba(95,122,90,0); }
+        }
+
+        .stamp {
+            position: absolute;
+            top: -18px;
+            right: 16px;
+            width: 88px;
+            height: 88px;
+            border: 2.5px solid var(--stamp);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--stamp);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 8.5px;
+            font-weight: 600;
+            letter-spacing: .06em;
+            line-height: 1.3;
+            text-transform: uppercase;
+            transform: rotate(-14deg) scale(1.5);
+            opacity: 0;
+            mix-blend-mode: multiply;
+            animation: stampDrop .8s .5s cubic-bezier(.2,1.4,.4,1) forwards;
+        }
+
+        .stamp::before {
+            content: "";
+            position: absolute;
+            inset: 5px;
+            border: 1px solid var(--stamp);
+            border-radius: 50%;
+            opacity: .6;
+        }
+
+        @keyframes stampDrop {
+            0% { opacity: 0; transform: rotate(-20deg) scale(1.8); }
+            60%, 100% { opacity: .85; transform: rotate(-14deg) scale(1); }
+        }
+
+        .eyebrow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--brass);
+        }
+
+        h1 {
+            font-family: 'Spectral', serif;
+            font-weight: 700;
+            font-size: clamp(30px,7vw,37px);
+            line-height: 1.05;
+            margin: 0 0 8px;
+            color: var(--ink);
+            letter-spacing: -.02em;
+        }
+        h1 em { color: var(--stamp); font-style: italic; }
+
+        .subtitle {
+            font-size: 13.5px;
+            color: var(--ink-soft);
+            line-height: 1.55;
+            margin: 0 0 25px;
+            max-width: 38ch;
+        }
+
+        .mode-switch {
+            display: flex;
+            background: #E7E4D5;
+            border: 1px solid var(--line);
+            padding: 3px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            border: 0;
+            background: transparent;
+            padding: 9px;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            border-radius: 3px;
+            transition: .25s ease;
+        }
+        .mode-btn:hover { color: var(--ink); }
+        .mode-btn.active {
+            background: var(--paper-card);
+            color: var(--stamp);
+            box-shadow: 0 2px 6px rgba(32,48,31,.10);
+        }
+
+        .message {
+            padding: 11px 13px;
+            border-radius: 3px;
+            margin-bottom: 19px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            line-height: 1.5;
+            animation: messageIn .35s ease;
+        }
+
+        @keyframes messageIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        .error { background: #F7EEE9; border: 1px solid #D9A69D; color: var(--stamp); }
+        .success { background: #EEF3E9; border: 1px solid var(--line); color: var(--forest); }
+
+        .field { margin-bottom: 19px; }
+        .field label {
+            display: block;
+            margin-bottom: 7px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+        }
+
+        .input-wrap { position: relative; }
+        .field input {
+            width: 100%;
+            border: none;
+            border-bottom: 1.5px solid var(--line);
+            background: transparent;
+            padding: 9px 34px 10px 2px;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 14px;
+            color: var(--ink);
+            transition: border-color .25s ease;
+        }
+        .field input:focus { outline: none; border-bottom-color: var(--stamp); }
+        .field input::placeholder { color: var(--ink-faint); }
+
+        .input-wrap::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 1.5px;
+            width: 0;
+            background: var(--stamp);
+            transition: width .35s ease;
+        }
+        .input-wrap:focus-within::after { width: 100%; }
+
+        .password-toggle {
+            position: absolute;
+            right: 2px;
+            bottom: 8px;
+            border: 0;
+            background: none;
+            cursor: pointer;
+            color: var(--ink-faint);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+        .password-toggle:hover { color: var(--stamp); }
+
+        .submit {
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            padding: 14px 18px;
+            border-radius: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11.5px;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #F3F1E3;
+            background: var(--forest);
+            position: relative;
+            overflow: hidden;
+            transition: background .25s ease, transform .1s ease, box-shadow .25s ease;
+            margin-top: 3px;
+            box-shadow: 0 5px 14px rgba(32,64,47,.15);
+        }
+        .submit:hover {
+            background: var(--forest-dark);
+            box-shadow: 0 8px 20px rgba(32,64,47,.20);
+            transform: translateY(-1px);
+        }
+        .submit:active { transform: scale(.985); }
+        .submit::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(100deg, transparent 40%, rgba(255,255,255,.15) 50%, transparent 60%);
+            transform: translateX(-120%);
+        }
+        .submit:hover::after {
+            transform: translateX(120%);
+            transition: transform .7s ease;
+        }
+
+        .trust-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            color: var(--ink-faint);
+            letter-spacing: .02em;
+        }
+        .trust-item { display: flex; align-items: center; gap: 5px; }
+        .trust-icon { color: var(--forest); font-size: 10px; }
+
+        .switch {
+            text-align: center;
+            margin-top: 19px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--line);
+            font-size: 11.5px;
+            color: var(--ink-soft);
+        }
+        .switch a {
+            color: var(--stamp);
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .switch a:hover { text-decoration: underline; }
+
+        .footnote {
+            margin-top: 18px;
+            padding-top: 13px;
+            border-top: 1px dashed var(--line);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9.5px;
+            color: var(--ink-faint);
+            display: flex;
+            justify-content: space-between;
+            letter-spacing: .03em;
+        }
+
+        .hidden { display: none !important; }
+
+        @media(max-width: 500px) {
+            body { padding: 24px 14px; }
+            .card { padding: 34px 23px 25px; }
+            .stage::before { left: 24px; }
+            .stamp { width: 72px; height: 72px; font-size: 7.5px; top: -13px; right: 8px; }
+            .floating { display: none; }
+        }
+
+        @media(prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
+    </style>
 </head>
-<body class="bg-slate-50 flex items-center justify-center min-h-screen">
+<body>
+    <div class="floating float-1">EXPENSES · ₹ 24,580.00</div>
+    <div class="floating float-2">CASHFLOW ↑ 12.4%</div>
+    <div class="floating float-3">AI ANALYSIS · READY</div>
+    <div class="floating float-4">LEDGER #0138 · VERIFIED</div>
 
-    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-slate-800">AI CFO</h1>
-            <p class="text-slate-500 mt-2" id="form-subtitle">Sign in to your account</p>
+    <div class="stage">
+        <div class="card">
+            <div class="stamp">AI<br>CFO<br>SECURE</div>
+
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <span>AI CFO SYSTEM ONLINE</span>
+            </div>
+
+            <div class="eyebrow">
+                <span>aiCFO Ledger</span>
+                <span>AUTH № 0138</span>
+            </div>
+
+            <div class="mode-switch">
+                <button type="button" class="mode-btn active" id="login-btn" onclick="toggleForm('login')">Sign In</button>
+                <button type="button" class="mode-btn" id="register-btn" onclick="toggleForm('register')">Create Account</button>
+            </div>
+
+            <!-- LOGIN -->
+            <div id="login-section">
+                <h1>Welcome <em>back.</em></h1>
+                <p class="subtitle">Your financial command center is ready. Sign in to continue managing your business intelligence.</p>
+
+                {% if error %}
+                <div class="message error">{{ error }}</div>
+                {% endif %}
+
+                {% if message %}
+                <div class="message success">{{ message }}</div>
+                {% endif %}
+
+                <form action="/login" method="POST">
+                    <div class="field">
+                        <label for="login-username">Username</label>
+                        <div class="input-wrap">
+                            <input type="text" id="login-username" name="username" placeholder="Enter your username" autocomplete="username" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="login-password">Password</label>
+                        <div class="input-wrap">
+                            <input type="password" id="login-password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('login-password', this)">SHOW</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit">Enter Financial Command Center</button>
+                </form>
+
+                <div class="trust-row">
+                    <div class="trust-item"><span class="trust-icon">✓</span><span>Secure Access</span></div>
+                    <div class="trust-item"><span class="trust-icon">◉</span><span>AI Powered</span></div>
+                    <div class="trust-item"><span class="trust-icon">◆</span><span>Private Ledger</span></div>
+                </div>
+
+                <div class="switch">
+                    Don't have an account? <a href="#" onclick="toggleForm('register'); return false;">Create one</a>
+                </div>
+            </div>
+
+            <!-- REGISTER -->
+            <div id="register-section" class="hidden">
+                <h1>Start your <em>ledger.</em></h1>
+                <p class="subtitle">Create your secure aiCFO workspace and let your financial data work smarter for you.</p>
+
+                {% if error %}
+                <div class="message error">{{ error }}</div>
+                {% endif %}
+
+                {% if message %}
+                <div class="message success">{{ message }}</div>
+                {% endif %}
+
+                <form action="/register" method="POST">
+                    <div class="field">
+                        <label for="register-username">Choose Username</label>
+                        <div class="input-wrap">
+                            <input type="text" id="register-username" name="username" placeholder="Choose a username" autocomplete="username" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="register-password">Create Password</label>
+                        <div class="input-wrap">
+                            <input type="password" id="register-password" name="password" placeholder="Create a secure password" autocomplete="new-password" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword('register-password', this)">SHOW</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit">Create My Financial Workspace</button>
+                </form>
+
+                <div class="trust-row">
+                    <div class="trust-item"><span class="trust-icon">✓</span><span>Encrypted</span></div>
+                    <div class="trust-item"><span class="trust-icon">✓</span><span>Private</span></div>
+                    <div class="trust-item"><span class="trust-icon">✓</span><span>AI Ready</span></div>
+                </div>
+
+                <div class="switch">
+                    Already have an account? <a href="#" onclick="toggleForm('login'); return false;">Sign in</a>
+                </div>
+            </div>
+
+            <div class="footnote">
+                <span>Financial Intelligence Platform</span>
+                <span>aiCFO • 2026</span>
+            </div>
         </div>
-
-        {% if error %}
-        <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center mb-4 border border-red-200">
-            {{ error }}
-        </div>
-        {% endif %}
-        {% if message %}
-        <div class="bg-green-50 text-green-600 p-3 rounded-lg text-sm text-center mb-4 border border-green-200">
-            {{ message }}
-        </div>
-        {% endif %}
-
-        <!-- Login Form -->
-        <form id="login-form" action="/login" method="POST" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-slate-700">Username</label>
-                <input type="text" name="username" required class="mt-1 block w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-700">Password</label>
-                <input type="password" name="password" required class="mt-1 block w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">Login</button>
-            <p class="text-center text-sm text-slate-600 mt-4">
-                Don't have an account? <a href="#" onclick="toggleForm('register')" class="text-blue-600 hover:underline">Sign up</a>
-            </p>
-        </form>
-
-        <!-- Register Form (Hidden by default) -->
-        <form id="register-form" action="/register" method="POST" class="space-y-4 hidden">
-            <div>
-                <label class="block text-sm font-medium text-slate-700">Choose a Username</label>
-                <input type="text" name="username" required class="mt-1 block w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-slate-700">Create a Password</label>
-                <input type="password" name="password" required class="mt-1 block w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <button type="submit" class="w-full bg-slate-800 text-white font-semibold py-2 rounded-lg hover:bg-slate-900 transition">Register</button>
-            <p class="text-center text-sm text-slate-600 mt-4">
-                Already have an account? <a href="#" onclick="toggleForm('login')" class="text-blue-600 hover:underline">Log in</a>
-            </p>
-        </form>
     </div>
 
     <script>
         function toggleForm(type) {
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-            const subtitle = document.getElementById('form-subtitle');
+            const login = document.getElementById("login-section");
+            const register = document.getElementById("register-section");
+            const loginBtn = document.getElementById("login-btn");
+            const registerBtn = document.getElementById("register-btn");
 
-            if (type === 'register') {
-                loginForm.classList.add('hidden');
-                registerForm.classList.remove('hidden');
-                subtitle.innerText = "Create a new account";
+            if (type === "register") {
+                login.classList.add("hidden");
+                register.classList.remove("hidden");
+                loginBtn.classList.remove("active");
+                registerBtn.classList.add("active");
             } else {
-                registerForm.classList.add('hidden');
-                loginForm.classList.remove('hidden');
-                subtitle.innerText = "Sign in to your account";
+                register.classList.add("hidden");
+                login.classList.remove("hidden");
+                registerBtn.classList.remove("active");
+                loginBtn.classList.add("active");
             }
+        }
+
+        function togglePassword(id, button) {
+            const input = document.getElementById(id);
+            const isPassword = input.type === "password";
+            input.type = isPassword ? "text" : "password";
+            button.textContent = isPassword ? "HIDE" : "SHOW";
         }
     </script>
 </body>

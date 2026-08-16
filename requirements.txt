@@ -10,5 +10,6 @@ PyJWT
 bcrypt
 plotly
 
+paddleocr
 python-dotenv
 google-genai

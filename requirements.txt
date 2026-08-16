@@ -5,16 +5,16 @@ jinja2
 
 sqlalchemy
 pandas
+plotly
 
 PyJWT
 bcrypt
-plotly
 
 groq
-
-paddlepaddle
-paddleocr
-
 python-dotenv
 google-genai
+
+paddlepaddle==3.3.1
+paddleocr
+
 gunicorn

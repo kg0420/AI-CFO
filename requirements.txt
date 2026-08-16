@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+python-multipart
+jinja2
+
+sqlalchemy
+pandas
+
+PyJWT
+bcrypt
+plotly
+
+python-dotenv
+google-genai

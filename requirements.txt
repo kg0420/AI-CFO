@@ -10,6 +10,8 @@ PyJWT
 bcrypt
 plotly
 
+groq
 paddleocr
 python-dotenv
 google-genai
+gunicorn

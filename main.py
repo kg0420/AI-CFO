@@ -36,7 +36,7 @@ if not api_key:
     raise ValueError("GEMINI_API_KEY is missing! Check your .env file.")
 
 client = genai.Client(api_key=api_key)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Ensure directories exist
 os.makedirs("temp_uploads", exist_ok=True)

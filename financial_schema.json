@@ -1,0 +1,146 @@
+{
+    "name": "financial_document",
+    "strict": true,
+    "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "document_metadata": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "document_type": {"type": ["string", "null"]},
+                    "invoice_number": {"type": ["string", "null"]},
+                    "order_number": {"type": ["string", "null"]},
+                    "tracking_or_packet_id": {"type": ["string", "null"]},
+                    "invoice_date": {"type": ["string", "null"]},
+                    "due_date": {"type": ["string", "null"]},
+                    "billing_period_start": {"type": ["string", "null"]},
+                    "billing_period_end": {"type": ["string", "null"]},
+                    "place_of_supply": {"type": ["string", "null"]},
+                    "nature_of_transaction": {"type": ["string", "null"]},
+                    "expense_category": {"type": ["string", "null"]},
+                    "currency_code": {"type": ["string", "null"]}
+                },
+                "required": [
+                    "document_type", "invoice_number", "order_number",
+                    "tracking_or_packet_id", "invoice_date", "due_date",
+                    "billing_period_start", "billing_period_end",
+                    "place_of_supply", "nature_of_transaction",
+                    "expense_category", "currency_code"
+                ]
+            },
+            "seller_details": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "vendor_name": {"type": ["string", "null"]},
+                    "platform_or_marketplace": {"type": ["string", "null"]},
+                    "billing_address": {"type": ["string", "null"]},
+                    "shipping_address": {"type": ["string", "null"]},
+                    "tax_id_gstin": {"type": ["string", "null"]},
+                    "pan_or_company_id": {"type": ["string", "null"]},
+                    "contact_phone": {"type": ["string", "null"]},
+                    "contact_email": {"type": ["string", "null"]}
+                },
+                "required": [
+                    "vendor_name", "platform_or_marketplace", "billing_address",
+                    "shipping_address", "tax_id_gstin", "pan_or_company_id",
+                    "contact_phone", "contact_email"
+                ]
+            },
+            "buyer_details": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "customer_name": {"type": ["string", "null"]},
+                    "customer_company": {"type": ["string", "null"]},
+                    "customer_type": {"type": ["string", "null"]},
+                    "billing_address": {"type": ["string", "null"]},
+                    "shipping_address": {"type": ["string", "null"]},
+                    "tax_id_gstin": {"type": ["string", "null"]}
+                },
+                "required": [
+                    "customer_name", "customer_company", "customer_type",
+                    "billing_address", "shipping_address", "tax_id_gstin"
+                ]
+            },
+            "financial_totals": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "gross_amount_pre_discount": {"type": ["number", "null"]},
+                    "total_discount_amount": {"type": ["number", "null"]},
+                    "taxable_amount_subtotal": {"type": ["number", "null"]},
+                    "total_tax_amount": {"type": ["number", "null"]},
+                    "shipping_and_handling_charges": {"type": ["number", "null"]},
+                    "other_charges": {"type": ["number", "null"]},
+                    "grand_total": {"type": ["number", "null"]},
+                    "amount_paid": {"type": ["number", "null"]},
+                    "balance_due": {"type": ["number", "null"]}
+                },
+                "required": [
+                    "gross_amount_pre_discount", "total_discount_amount",
+                    "taxable_amount_subtotal", "total_tax_amount",
+                    "shipping_and_handling_charges", "other_charges",
+                    "grand_total", "amount_paid", "balance_due"
+                ]
+            },
+            "tax_breakdown": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "cgst_amount": {"type": ["number", "null"]},
+                    "sgst_amount": {"type": ["number", "null"]},
+                    "igst_amount": {"type": ["number", "null"]},
+                    "vat_amount": {"type": ["number", "null"]},
+                    "sales_tax_amount": {"type": ["number", "null"]},
+                    "tax_cess_amount": {"type": ["number", "null"]}
+                },
+                "required": [
+                    "cgst_amount", "sgst_amount", "igst_amount",
+                    "vat_amount", "sales_tax_amount", "tax_cess_amount"
+                ]
+            },
+            "payment_details": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "payment_method": {"type": ["string", "null"]},
+                    "payment_transaction_id": {"type": ["string", "null"]},
+                    "payment_date": {"type": ["string", "null"]}
+                },
+                "required": ["payment_method", "payment_transaction_id", "payment_date"]
+            },
+            "line_items": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "item_id_or_sku": {"type": ["string", "null"]},
+                        "description": {"type": ["string", "null"]},
+                        "hsn_sac_code": {"type": ["string", "null"]},
+                        "quantity": {"type": ["number", "null"]},
+                        "unit_price": {"type": ["number", "null"]},
+                        "discount_amount": {"type": ["number", "null"]},
+                        "taxable_value": {"type": ["number", "null"]},
+                        "tax_percentage": {"type": ["number", "null"]},
+                        "tax_amount": {"type": ["number", "null"]},
+                        "total_item_amount": {"type": ["number", "null"]}
+                    },
+                    "required": [
+                        "item_id_or_sku", "description", "hsn_sac_code",
+                        "quantity", "unit_price", "discount_amount",
+                        "taxable_value", "tax_percentage", "tax_amount",
+                        "total_item_amount"
+                    ]
+                }
+            }
+        },
+        "required": [
+            "document_metadata", "seller_details", "buyer_details",
+            "financial_totals", "tax_breakdown", "payment_details", "line_items"
+        ]
+    }
+}

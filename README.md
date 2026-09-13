@@ -156,11 +156,10 @@ You can obtain a Gemini API key from **Google AI Studio**.
 ## 2. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/AI_CFO.git
+git clone https://github.com/kg0420/AI_CFO.git
 cd AI_CFO
 ```
 
-Replace `yourusername` with your actual GitHub username.
 
 ---
 

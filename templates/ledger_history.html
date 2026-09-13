@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aiCFO — Processing History</title>
+
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --paper: #EFEDDF;
+            --paper-card: #FBFAF2;
+            --line: #C9D4BE;
+            --line-soft: #DDE4D2;
+            --ink: #20301F;
+            --ink-soft: #57644F;
+            --ink-faint: #8B9682;
+            --stamp: #A5382B;
+            --stamp-dim: #C17569;
+            --brass: #A9822F;
+            --forest: #20402F;
+            --forest-dark: #152B20;
+            --mint: #5F7A5A;
+            --shadow: rgba(32, 48, 31, 0.18);
+            --focus: #A9822F;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Work Sans', sans-serif;
+            color: var(--ink);
+            background-color: var(--paper);
+            background-image:
+                repeating-linear-gradient(to bottom, transparent 0 30px, var(--line-soft) 30px 31px),
+                radial-gradient(1200px 600px at 15% -10%, rgba(169, 130, 47, 0.08), transparent 60%),
+                radial-gradient(900px 500px at 110% 110%, rgba(165, 56, 43, 0.06), transparent 55%);
+            position: relative;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.25;
+            mix-blend-mode: multiply;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        .app {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 16px;
+            z-index: 100;
+            width: min(1120px, calc(100% - 32px));
+            margin: 16px auto 0;
+            min-height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 10px 12px 10px 16px;
+            background: rgba(251, 250, 242, 0.96);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            box-shadow: 0 12px 32px -20px var(--shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: var(--ink);
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--forest);
+            color: #F3F1E3;
+            border-radius: 4px;
+            font-family: 'Spectral', serif;
+            font-size: 20px;
+            font-weight: 700;
+            box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+        }
+
+        .brand-copy {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .brand-name {
+            font-family: 'Spectral', serif;
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .brand-tagline {
+            margin-top: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 8px;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .nav-link {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 13px;
+            border-radius: 4px;
+            color: var(--ink-soft);
+            text-decoration: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: .045em;
+            text-transform: uppercase;
+            transition: color .2s ease, background .2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--ink);
+            background: var(--paper);
+        }
+
+        .nav-link.active {
+            color: var(--stamp);
+            background: #F3EFE3;
+        }
+
+        .nav-link.active::after {
+            content: "";
+            position: absolute;
+            left: 13px;
+            right: 13px;
+            bottom: 4px;
+            height: 1px;
+            background: var(--stamp);
+            opacity: .7;
+        }
+
+        .nav-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            line-height: 1;
+        }
+
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding-left: 10px;
+            margin-left: 5px;
+            border-left: 1px solid var(--line-soft);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            color: var(--ink-faint);
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--mint);
+            box-shadow: 0 0 0 3px rgba(95, 122, 90, .10);
+        }
+
+        .nav-toggle {
+            display: none;
+            width: 40px;
+            height: 38px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            background: var(--paper);
+            color: var(--ink);
+            cursor: pointer;
+            font-size: 19px;
+        }
+
+        /* Main */
+        main {
+            width: 100%;
+            padding: 54px 0 80px;
+        }
+
+        .page-header {
+            width: min(720px, 100%);
+            margin: 0 auto 35px;
+            text-align: center;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--brass);
+        }
+
+        .eyebrow::before,
+        .eyebrow::after {
+            content: "";
+            width: 34px;
+            height: 1px;
+            background: var(--line);
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-family: 'Spectral', serif;
+            font-size: clamp(32px, 5vw, 48px);
+            line-height: 1.05;
+            font-weight: 700;
+            letter-spacing: -.025em;
+        }
+
+        .page-header h1 em {
+            color: var(--stamp);
+            font-style: italic;
+        }
+
+        .page-description {
+            max-width: 600px;
+            margin: 13px auto 0;
+            color: var(--ink-soft);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Summary */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            position: relative;
+            padding: 18px;
+            background: var(--paper-card);
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            box-shadow: 0 12px 30px -20px var(--shadow);
+        }
+
+        .summary-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--forest), var(--brass), var(--stamp));
+            opacity: .7;
+        }
+
+        .summary-label {
+            margin-bottom: 8px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            letter-spacing: .11em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+        }
+
+        .summary-value {
+            font-family: 'Spectral', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        /* Section */
+        .section-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 15px;
+            padding-bottom: 12px;
+            margin-bottom: 14px;
+            border-bottom: 1px dashed var(--line);
+        }
+
+        .section-title {
+            margin: 0;
+            font-family: 'Spectral', serif;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .section-note {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9px;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+        }
+
+        /* History List */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 18px;
+            background: var(--paper-card);
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 10px 25px -22px var(--shadow);
+            transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .history-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--brass);
+            box-shadow: 0 18px 35px -20px var(--shadow);
+        }
+
+        .history-card::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 12px;
+            bottom: 12px;
+            width: 2px;
+            background: var(--stamp);
+            opacity: 0;
+            transition: opacity .2s ease;
+        }
+
+        .history-card:hover::after {
+            opacity: .75;
+        }
+
+        .history-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 0;
+        }
+
+        .history-icon {
+            width: 48px;
+            height: 48px;
+            flex: 0 0 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            background: var(--paper);
+            font-size: 20px;
+            color: var(--ink-soft);
+        }
+
+        .history-card:hover .history-icon {
+            color: var(--stamp);
+            border-color: var(--stamp-dim);
+        }
+
+        .history-info {
+            min-width: 0;
+        }
+
+        .history-title {
+            margin: 0 0 6px;
+            font-family: 'Spectral', serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .history-date {
+            margin: 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 9.5px;
+            letter-spacing: .03em;
+            color: var(--ink-faint);
+        }
+
+        .history-stats {
+            display: flex;
+            align-items: center;
+            gap: 27px;
+            flex-shrink: 0;
+        }
+
+        .stat {
+            text-align: right;
+        }
+
+        .stat-label {
+            margin-bottom: 4px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 8px;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+        }
+
+        .stat-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .open-arrow {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            background: var(--paper);
+            color: var(--ink-soft);
+            font-size: 17px;
+            transition: color .2s ease, background .2s ease, border-color .2s ease;
+        }
+
+        .history-card:hover .open-arrow {
+            background: var(--forest);
+            border-color: var(--forest);
+            color: #F3F1E3;
+        }
+
+        /* Empty State */
+        .empty {
+            position: relative;
+            padding: 65px 25px;
+            text-align: center;
+            background: var(--paper-card);
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            box-shadow: 0 18px 45px -25px var(--shadow);
+        }
+
+        .empty::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--forest), var(--brass), var(--stamp));
+            opacity: .7;
+        }
+
+        .empty-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            background: var(--paper);
+            font-size: 21px;
+        }
+
+        .empty h2 {
+            margin: 0 0 7px;
+            font-family: 'Spectral', serif;
+            font-size: 22px;
+        }
+
+        .empty p {
+            margin: 0;
+            color: var(--ink-soft);
+            font-size: 13px;
+        }
+
+        /* Mobile Breakpoints */
+        @media (max-width: 800px) {
+            .navbar {
+                top: 10px;
+                margin-top: 10px;
+            }
+
+            .nav-status {
+                display: none;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: calc(100% + 8px);
+                left: 0;
+                right: 0;
+                padding: 8px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 3px;
+                background: var(--paper-card);
+                border: 1px solid var(--line);
+                border-radius: 5px;
+                box-shadow: 0 18px 35px -18px var(--shadow);
+            }
+
+            .nav-links.open {
+                display: flex;
+            }
+
+            .nav-link {
+                padding: 12px 13px;
+            }
+
+            .nav-link.active::after {
+                display: none;
+            }
+
+            main {
+                padding-top: 42px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .history-card {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .history-stats {
+                width: 100%;
+                justify-content: space-between;
+                gap: 12px;
+            }
+
+            .stat {
+                text-align: left;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: min(calc(100% - 24px), 620px);
+            }
+
+            .navbar {
+                width: calc(100% - 24px);
+                min-height: 62px;
+                padding: 9px 10px 9px 12px;
+            }
+
+            .brand-mark {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+
+            .brand-name {
+                font-size: 19px;
+            }
+
+            .brand-tagline {
+                display: none;
+            }
+
+            main {
+                padding: 36px 0 60px;
+            }
+
+            .page-header h1 {
+                font-size: 34px;
+            }
+
+            .section-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .brand-copy {
+                display: none;
+            }
+
+            .navbar {
+                justify-content: space-between;
+            }
+
+            .page-header h1 {
+                font-size: 30px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="/" class="brand" aria-label="aiCFO Dashboard">
+            <div class="brand-mark">C</div>
+            <div class="brand-copy">
+                <div class="brand-name">aiCFO</div>
+                <div class="brand-tagline">Intelligent Finance</div>
+            </div>
+        </a>
+
+        <div class="nav-links" id="navLinks">
+            <a href="/" class="nav-link">
+                <span class="nav-icon">⌂</span>
+                Dashboard
+            </a>
+            <a href="/auth" class="nav-link">
+                <span class="nav-icon">▤</span>
+                Login / Register
+            </a>
+            <a href="/receipts" class="nav-link">
+                <span class="nav-icon">▣</span>
+                Receipt Vault
+            </a>
+            <a href="/ledger" class="nav-link active">
+                <span class="nav-icon">▤</span>
+                Ledger
+            </a>
+            <div class="nav-status">
+                <span class="status-dot"></span>
+                Secure
+            </div>
+        </div>
+
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="Open navigation" aria-expanded="false">
+            ☰
+        </button>
+    </nav>
+
+    <!-- MAIN -->
+    <main>
+        <div class="container">
+            <!-- PAGE HEADER -->
+            <header class="page-header">
+                <div class="eyebrow">aiCFO · Financial Archive</div>
+                <h1>Processing <em>history.</em></h1>
+                <p class="page-description">
+                    Every time you process your invoices, aiCFO preserves that financial snapshot so you can return to the complete ledger and visual analysis later.
+                </p>
+            </header>
+
+            <!-- SUMMARY -->
+            <section class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-label">Processing Sessions</div>
+                    <div class="summary-value">{{ history|length }}</div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-label">Invoices Processed</div>
+                    <div class="summary-value">
+                        {% set invoice_total = namespace(value=0) %}
+                        {% for batch in history %}
+                            {% set invoice_total.value = invoice_total.value + (batch.invoice_count or 0) %}
+                        {% endfor %}
+                        {{ invoice_total.value }}
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-label">Total Processed</div>
+                    <div class="summary-value">
+                        {% set amount_total = namespace(value=0) %}
+                        {% for batch in history %}
+                            {% set amount_total.value = amount_total.value + (batch.total_amount or 0) %}
+                        {% endfor %}
+                        ₹{{ "%.2f"|format(amount_total.value) }}
+                    </div>
+                </div>
+            </section>
+
+            <!-- HISTORY -->
+            <section>
+                <div class="section-header">
+                    <h2 class="section-title">Invoice Processing Sessions</h2>
+                    <span class="section-note">Select a session to open ledger</span>
+                </div>
+
+                {% if history %}
+                    <div class="history-list">
+                        {% for batch in history %}
+                            <a href="/ledger/{{ batch.batch_id }}" class="history-card">
+                                <div class="history-left">
+                                    <div class="history-icon">🧾</div>
+                                    <div class="history-info">
+                                        <h3 class="history-title">Invoice Processing #{{ loop.index }}</h3>
+                                        <p class="history-date">{{ batch.processed_at }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="history-stats">
+                                    <div class="stat">
+                                        <div class="stat-label">Invoices</div>
+                                        <div class="stat-value">{{ batch.invoice_count }}</div>
+                                    </div>
+
+                                    <div class="stat">
+                                        <div class="stat-label">Total</div>
+                                        <div class="stat-value">₹{{ "%.2f"|format(batch.total_amount or 0) }}</div>
+                                    </div>
+
+                                    <div class="open-arrow">→</div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty">
+                        <div class="empty-icon">🧾</div>
+                        <h2>No processing history</h2>
+                        <p>Process your first invoice and your financial session will appear here.</p>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+    (function () {
+        const toggle = document.getElementById("navToggle");
+        const links = document.getElementById("navLinks");
+        if (!toggle || !links) return;
+
+        toggle.addEventListener("click", function () {
+            const isOpen = links.classList.toggle("open");
+            toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+            toggle.setAttribute("aria-label", isOpen ? "Close navigation" : "Open navigation");
+        });
+
+        links.querySelectorAll("a").forEach(function (link) {
+            link.addEventListener("click", function () {
+                links.classList.remove("open");
+                toggle.setAttribute("aria-expanded", "false");
+                toggle.setAttribute("aria-label", "Open navigation");
+            });
+        });
+    })();
+</script>
+
+</body>
+</html>

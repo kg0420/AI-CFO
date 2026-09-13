@@ -1,103 +1,144 @@
-from expense_processing import load_all_expenses    
 from fastapi import Request
-from graph_plotting import generate_graphs
 from fastapi.templating import Jinja2Templates
+
+from graph_plotting import generate_graphs
 
 templates = Jinja2Templates(directory="templates")
 
 def render_report_response(request: Request, current_batch: list):
-    """Helper to calculate totals, metrics, ledger items, and graphs."""
-    all_stored_expenses = load_all_expenses()
-    
+    """
+    Render the report for the CURRENT upload only.
+
+    Important:
+    `current_batch` contains only the documents processed
+    during the current /generate-report request.
+    Historical expenses must NOT be loaded here.
+    """
+    current_expenses = current_batch or []
     combined_line_items = []
     total_spent = 0.0
-    
-    for data in all_stored_expenses:
-        total_spent += data.get("financial_totals", {}).get("grand_total", 0) or 0
-        
+
+    for data in current_expenses:
+        financial_totals = data.get("financial_totals", {})
+        grand_total = financial_totals.get("grand_total")
+
+        if grand_total is None:
+            line_items = data.get("line_items", [])
+            grand_total = sum(
+                (item.get("total_item_amount") or 0.0) for item in line_items
+            )
+
+        total_spent += grand_total or 0.0
         line_items = data.get("line_items", [])
-        
-        # If line_items is empty, create a fallback entry using merchant / category description
+
+        # ====================================================
+        # FALLBACK WHEN NO LINE ITEMS EXIST
+        # ====================================================
         if not line_items:
             fallback_desc = (
-                data.get("merchant_info", {}).get("name") or 
-                data.get("category") or 
-                "Expense Entry"
+                data.get("merchant_info", {}).get("name")
+                or data.get("seller_details", {}).get("vendor_name")
+                or data.get("category")
+                or "Expense Entry"
             )
-            amount = data.get("financial_totals", {}).get("grand_total", 0.0)
+            
+            amount = financial_totals.get("grand_total", 0.0) or 0.0
+
             combined_line_items.append({
                 "description": fallback_desc,
                 "item_description": fallback_desc,
                 "item_name": fallback_desc,
                 "name": fallback_desc,
-                "amount": float(amount) if amount else 0.0,
-                "price": float(amount) if amount else 0.0,
-                "quantity": 1
+                "amount": float(amount),
+                "price": float(amount),
+                "quantity": 1,
             })
-        else:
-            for item in line_items:
-                if isinstance(item, dict):
-                    # Check ALL possible item description key aliases
-                    item_desc = (
-                        item.get("item_description") or 
-                        item.get("description") or 
-                        item.get("item_name") or 
-                        item.get("name") or 
-                        item.get("item") or 
-                        item.get("product_name") or 
-                        item.get("particulars") or 
-                        data.get("merchant_info", {}).get("name") or
-                        "General Item"
-                    )
-                    
-                    raw_amount = (
-                        item.get("total_item_amount") or 
-                        item.get("price") or 
-                        item.get("unit_price") or 
-                        item.get("amount") or 
-                        0.0
-                    )
-                    
-                    # Store all possible key variations so Jinja template renders correctly
-                    combined_line_items.append({
-                        "description": item_desc,
-                        "item_description": item_desc,
-                        "item_name": item_desc,
-                        "name": item_desc,
-                        "amount": float(raw_amount) if raw_amount else 0.0,
-                        "price": float(raw_amount) if raw_amount else 0.0,
-                        "quantity": item.get("quantity") or 1
-                    })
-            
-    ocr_count = sum(1 for e in all_stored_expenses if e.get("data_source") == "ai_ocr")
-    manual_count = sum(1 for e in all_stored_expenses if e.get("data_source") == "manual_entry")
+            continue
 
-    # Generate all graphs
-    graphs = generate_graphs(all_stored_expenses)
+        # ====================================================
+        # PROCESS LINE ITEMS
+        # ====================================================
+        for item in line_items:
+            if not isinstance(item, dict):
+                continue
 
+            item_desc = (
+                item.get("item_description")
+                or item.get("description")
+                or item.get("item_name")
+                or item.get("name")
+                or item.get("item")
+                or item.get("product_name")
+                or item.get("particulars")
+                or data.get("seller_details", {}).get("vendor_name")
+                or "General Item"
+            )
+
+            raw_amount = (
+                item.get("total_item_amount") if item.get("total_item_amount") is not None
+                else item.get("price") if item.get("price") is not None
+                else item.get("unit_price") if item.get("unit_price") is not None
+                else item.get("amount") if item.get("amount") is not None
+                else 0.0
+            )
+
+            try:
+                amount = float(raw_amount or 0.0)
+            except (TypeError, ValueError):
+                amount = 0.0
+
+            combined_line_items.append({
+                "description": item_desc,
+                "item_description": item_desc,
+                "item_name": item_desc,
+                "name": item_desc,
+                "amount": amount,
+                "price": amount,
+                "quantity": item.get("quantity") or 1,
+            })
+
+    # ========================================================
+    # CURRENT BATCH METRICS
+    # ========================================================
+    ocr_count = sum(1 for exp in current_expenses if exp.get("data_source") == "ai_ocr")
+    manual_count = sum(1 for exp in current_expenses if exp.get("data_source") == "manual_entry")
+    automation_rate = (ocr_count / len(current_expenses) * 100) if current_expenses else 0.0
+
+    # ========================================================
+    # GRAPHS — CURRENT UPLOAD ONLY
+    # ========================================================
+    graphs = generate_graphs(current_expenses)
+
+    # ========================================================
+    # RENDER REPORT
+    # ========================================================
     return templates.TemplateResponse(
-        request=request, 
-        name="report.html", 
+        request=request,
+        name="report.html",
         context={
             "raw_data": current_batch,
             "expenses": combined_line_items,
             "total_spent": total_spent,
             "metrics": {
-                "total_entries": len(all_stored_expenses),
+                "total_entries": len(current_expenses),
                 "ai_processed": ocr_count,
-                "human_manual": manual_count
+                "human_manual": manual_count,
             },
-            # --- PASS ALL 6 GRAPHS TO HTML ---
-            "graph_donut": graphs["graph_donut"],
-            "graph_vendor": graphs["graph_vendor"],
-            "graph_timeline": graphs["graph_timeline"],
-            "graph_tax": graphs["graph_tax"],
-            "graph_treemap": graphs["graph_treemap"],
-            "graph_source": graphs["graph_source"],
-            # ---------------------------------
+            "graph_donut": graphs.get("graph_donut"),
+            "graph_vendor": graphs.get("graph_vendor"),
+            "graph_timeline": graphs.get("graph_timeline"),
+            "graph_cumulative": graphs.get("graph_cumulative"),
+            "graph_tax": graphs.get("graph_tax"),
+            "graph_gst": graphs.get("graph_gst"),
+            "graph_payment_status": graphs.get("graph_payment_status"),
+            "graph_payment_method": graphs.get("graph_payment_method"),
+            "graph_treemap": graphs.get("graph_treemap"),
+            "graph_line_items": graphs.get("graph_line_items"),
+            "graph_source": graphs.get("graph_source"),
             "suggestions": [
                 f"Total recorded spend: ₹{total_spent:.2f}",
-                f"Automation Rate: {(ocr_count / len(all_stored_expenses) * 100) if all_stored_expenses else 0:.1f}% AI vs {manual_count} Manual Fallbacks."
-            ]
-        }
+                f"Automation Rate: {automation_rate:.1f}% AI vs {manual_count} Manual Fallbacks.",
+            ],
+            **graphs,
+        },
     )

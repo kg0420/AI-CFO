@@ -1,0 +1,384 @@
+[
+  {
+    "batch_id": "3a189d5f850f43d1bc75d40bbeaed6f1",
+    "user_id": "krish",
+    "processed_at": "12 Sep 2026, 18:03 UTC",
+    "invoice_count": 1,
+    "total_amount": 22.0,
+    "expenses": [
+      {
+        "data_source": "manual_entry",
+        "merchant_info": {
+          "name": "22",
+          "date": "2026-09-12"
+        },
+        "financial_totals": {
+          "grand_total": 22.0,
+          "tax": 0.0
+        },
+        "category": "Meals & Entertainment",
+        "line_items": [
+          {
+            "item_name": "22",
+            "description": "22",
+            "item_description": "22",
+            "price": 22.0,
+            "quantity": 1
+          }
+        ],
+        "user_id": "krish"
+      }
+    ]
+  },
+  {
+    "batch_id": "d980a4192f80",
+    "user_id": "krish",
+    "processed_at": "12 Sep 2026, 16:24 UTC",
+    "invoice_count": 3,
+    "total_amount": 13963.86,
+    "expenses": [
+      {
+        "document_metadata": {
+          "document_type": "Tax Invoice",
+          "invoice_number": "096650-2025",
+          "order_number": "315784",
+          "tracking_or_packet_id": null,
+          "invoice_date": "2025-03-24",
+          "due_date": null,
+          "billing_period_start": null,
+          "billing_period_end": null,
+          "place_of_supply": null,
+          "nature_of_transaction": null,
+          "expense_category": null,
+          "currency_code": "INR"
+        },
+        "seller_details": {
+          "vendor_name": "RoboticsDNA",
+          "platform_or_marketplace": null,
+          "billing_address": "Roboticsdna- Godown No. 1, Anant Industrial Estate, 1st Kaman, Dangat Patil Nagar, Shivane, Pune, Maharashtra 411023",
+          "shipping_address": "Roboticsdna- Godown No. 1, Anant Industrial Estate, 1st Kaman, Dangat Patil Nagar, Shivane, Pune, Maharashtra 411023",
+          "tax_id_gstin": "27AWKPT6559P1ZA",
+          "pan_or_company_id": null,
+          "contact_phone": "+91 8329649598 / +91 7507177602",
+          "contact_email": "info@roboticsdna.in"
+        },
+        "buyer_details": {
+          "customer_name": "Bharati Vidyapeeth's College of Engineering",
+          "customer_company": "Bharati Vidyapeeth's College of Engineering",
+          "customer_type": "College",
+          "billing_address": "Bharati Vidyapeeth College of Engineering, Boy's Hostel, Lavale Pune, Pune 412115, Maharashtra",
+          "shipping_address": "Bharati Vidyapeeth College of Engineering, Boy's Hostel, Lavale Pune, Pune 412115, Maharashtra",
+          "tax_id_gstin": null
+        },
+        "financial_totals": {
+          "gross_amount_pre_discount": 4329.42,
+          "total_discount_amount": 0.0,
+          "taxable_amount_subtotal": 3600.0,
+          "total_tax_amount": 660.42,
+          "shipping_and_handling_charges": 69.0,
+          "other_charges": 0.0,
+          "grand_total": 4329.42,
+          "amount_paid": null,
+          "balance_due": null
+        },
+        "tax_breakdown": {
+          "cgst_amount": 330.21,
+          "sgst_amount": 330.21,
+          "igst_amount": null,
+          "vat_amount": null,
+          "sales_tax_amount": null,
+          "tax_cess_amount": null
+        },
+        "payment_details": {
+          "payment_method": "Manual Bank Transfer",
+          "payment_transaction_id": null,
+          "payment_date": null
+        },
+        "line_items": [
+          {
+            "item_id_or_sku": null,
+            "description": "JXCT Soil NPK RDNA-D135",
+            "hsn_sac_code": "90278990",
+            "quantity": 1,
+            "unit_price": 3600.0,
+            "discount_amount": 0.0,
+            "taxable_value": 3600.0,
+            "tax_percentage": 9.0,
+            "tax_amount": 660.42,
+            "total_item_amount": 4248.0
+          }
+        ],
+        "source_file": "1_aba70560_receipt19.jpg",
+        "raw_ocr_text_reference": "\"！\nAddress: Roboticsdna- Godown No. 1, Anant Industrial Estate,\n1st Kaman, Dangat Patil Nagar, Shivane, Pune, Maharashtra\n411023\nRoboticsD∩A.In\n0\nMobile: +91 8329649598/ +91 7507177602\n川\nEmail:info@roboticsdna.in\nTax Invoice\nGSTIN:27AWKPT6559P1ZA\nInvoice #: 096650-2025\nBill to:\nShip to:\nInvoice Date: March 24, 2025\nBharati Vidyapeeth's College of\nBharati Vidyapeeth's\nOrder Date: March 24, 2025\nEngineering Lavale Pune\nCollege of Engineering\nOrder Number: 315784\nKrish Gupta\nLavale Pune\nPayment Method: Manual Bank Transfer\nat boy's hostel of bharati\nKrish Gupta\nShipping Method: Surface Shipping (4 to 7 Working Days)\nvidyapeeth college of engineering\nat boy's hostel of\nlavale pune\nbharati vidyapeeth\npune 412115\ncollege of engineering\nMaharashtra\nlavale pune\nPhone:+917219570360\npune 412115\nMaharashtra\nS.No.\nDescription\nSKU\nHSN\nUnit Price\nQty\nAmount\nSGST\nCGST\nAmount\n1\nJXCT Soil NPK RDNA-D135\n90278990\n3,600.00\n1\n3,600.00\n324.00\n324.00\n4,248.00\nSensor 5V\n(9%)\n(9%)\nRS485\nSubtotal:\n3,600.00\nShipping:\n69.00\nCGST:\n330.21\nSGST:\n330.21\nTotal:\n4,329.42\nAmount in Words :FOUR THOusAND, THREE HUnDRED, TWENTY-NINE RUPEES,\nFORTY-TWO PAISE ONLY\n1of1",
+        "validation": {
+          "status": "REVIEW_REQUIRED",
+          "line_items_count": 1,
+          "valid_line_items": 1,
+          "line_items_total": 4248.0,
+          "grand_total": 4329.42,
+          "line_items_difference": 81.42,
+          "accounting_total": 4329.42,
+          "accounting_difference": 0.0,
+          "tax_breakdown_total": 660.42,
+          "tax_difference": 0.0
+        },
+        "document_hash": "cbb4b982226db943699a75142d1c8e718deb2973b268dd3f2136d4e180160021",
+        "request_id": "d980a4192f80",
+        "data_source": "ai_ocr",
+        "user_id": "krish"
+      },
+      {
+        "document_metadata": {
+          "document_type": "tax_invoice",
+          "invoice_number": "I0624KO001873338",
+          "order_number": "1242843-0942048-8479201",
+          "tracking_or_packet_id": "9431311286",
+          "invoice_date": "2023-08-02",
+          "due_date": null,
+          "billing_period_start": null,
+          "billing_period_end": null,
+          "place_of_supply": "KARNATAKA",
+          "nature_of_transaction": "Inter-State",
+          "expense_category": "Clothing & Apparel",
+          "currency_code": "INR"
+        },
+        "seller_details": {
+          "vendor_name": "Konde Products & Services Private Limited",
+          "platform_or_marketplace": "Myntra",
+          "billing_address": "Embassy Industrial Park,Village Pathredi,TaoruRoad,Gurgaon, Haryana,Bhiwadi, Haryana-122413",
+          "shipping_address": "EmbassyIndustrial Park,VillagePathredi,TaoruRoad,Gurgaon, Haryana, Bhiwadi, Haryana-122413",
+          "tax_id_gstin": "06AAGCK4304E2ZY",
+          "pan_or_company_id": null,
+          "contact_phone": "+91806156 1999",
+          "contact_email": null
+        },
+        "buyer_details": {
+          "customer_name": "Chahat Verma",
+          "customer_company": null,
+          "customer_type": "Unregistered",
+          "billing_address": "#16,17,SriSmtBhagyamma building,E1,5th floor,1stcross,Kaveri layoutMarathahalliColonyBengaluru-560037KA,India",
+          "shipping_address": "#16,17,SriSmtBhagyamma building,E1,5th floor,1stcross,Kaveri layoutMarathahalliColonyBengaluru-560037KA,India",
+          "tax_id_gstin": null
+        },
+        "financial_totals": {
+          "gross_amount_pre_discount": 1899.0,
+          "total_discount_amount": 1349.0,
+          "taxable_amount_subtotal": 523.81,
+          "total_tax_amount": 26.19,
+          "shipping_and_handling_charges": null,
+          "other_charges": 0.0,
+          "grand_total": 550.0,
+          "amount_paid": 550.0,
+          "balance_due": null
+        },
+        "tax_breakdown": {
+          "cgst_amount": null,
+          "sgst_amount": null,
+          "igst_amount": 26.19,
+          "vat_amount": null,
+          "sales_tax_amount": null,
+          "tax_cess_amount": null
+        },
+        "payment_details": {
+          "payment_method": null,
+          "payment_transaction_id": null,
+          "payment_date": null
+        },
+        "line_items": [
+          {
+            "item_id_or_sku": "TOKYJENS45405176",
+            "description": "Tokyo Talkies Women Blue Flared High-Rise Clean Look Jeans, Size: 30",
+            "hsn_sac_code": "62046200",
+            "quantity": 1.0,
+            "unit_price": 1899.0,
+            "discount_amount": 1349.0,
+            "taxable_value": 523.81,
+            "tax_percentage": 5.0,
+            "tax_amount": 26.19,
+            "total_item_amount": 550.0
+          }
+        ],
+        "source_file": "0_f40c0629_receipt - Copy.jpg",
+        "raw_ocr_text_reference": "Tax Invoice\n9431311286\nInvoiceNumber:I0624KO001873338\nPacketID: 9431311286\nOrderNumber:1242843-0942048-8479201\nInvoice Date: 02Aug 2023\nNature ofTransaction:Inter-State\nOrder Date: 02 Aug2023\nPlaceofSupply:KARNATAKA\nNature of Supply: Goods\nBillto/ Ship to:\nChahat Verma\n#16,17,SriSmtBhagyamma building,E1,5th floor,1stcross,KaveriCustomerType:Unregistered\nlayoutMarathahalliColonyBengaluru-560037KA,India\nBill From:\nShip From:\nKonde Products &Services Private Limited\nKonde Products &Services Private Limited\nEmbassy Industrial Park,Village Pathredi,TaoruRoad,Gurgaon,\nEmbassyIndustrial Park,VillagePathredi,TaoruRoad,Gurgaon,\nHaryana,Bhiwadi, Haryana-122413\nHaryana, Bhiwadi, Haryana-122413\nGSTINNumber:06AAGCK4304E2ZY\nGross\nOther\nQty\nDiscount\nTaxable\nCGST\nSGST/\nCharges\nIGST\nCess Total Amount\nAmount\nAmount\nUGST\nTOKYJENS45405176- Tokyo Talkies Women Blue Flared High-Rise Clean Look Jeans, Size: 30\nHSN:62046200,5.0%IGST\n1\nRs 1899.00 Rs 1349.00\nRs0.00\nRs523.81\nRs 26.19\nRs 550.00\nTOTAL\nRs 1899.00\nRs1349.00\nRs0.00\nRs 523.81\nRs 26.19\nRs 550.00\nKonde Products & Services Private Limited\nAuthorized Signatory\nDECLARATION\nThe goods sold as part ofthis shipment are intended forend-user consumption and are not for retail sale\nPurchase made on\nRegAddress:Konde Products&Services Private Limited,3rd Hoor, No.1185,5th Main,7th sector HSR layout,Obeya\nTranquil,Bengaluru,BengaluruUrban,Bengaluru,KARNATAKA-560102\nM\nIfyou have any questions, feel free to cal1customer care at+91806156 1999oruse Contact Ussectionin ourApp,\nMynta\nor log on towww.myntra.com/contactus",
+        "validation": {
+          "status": "VALID",
+          "line_items_count": 1,
+          "valid_line_items": 1,
+          "line_items_total": 550.0,
+          "grand_total": 550.0,
+          "line_items_difference": 0.0,
+          "accounting_total": 550.0,
+          "accounting_difference": 0.0,
+          "tax_breakdown_total": 26.19,
+          "tax_difference": 0.0
+        },
+        "document_hash": "ecc169f7c8086bf3211a4a6e137a5cdf14cf3bfbbccc0b1ed0775190ef4eb4b0",
+        "request_id": "d980a4192f80",
+        "data_source": "ai_ocr",
+        "user_id": "krish"
+      },
+      {
+        "document_metadata": {
+          "document_type": "invoice",
+          "invoice_number": "097141-2025",
+          "order_number": "316688",
+          "tracking_or_packet_id": null,
+          "invoice_date": "2025-03-29",
+          "due_date": null,
+          "billing_period_start": null,
+          "billing_period_end": null,
+          "place_of_supply": null,
+          "nature_of_transaction": null,
+          "expense_category": "Electronics",
+          "currency_code": "INR"
+        },
+        "seller_details": {
+          "vendor_name": "Roboticsdna",
+          "platform_or_marketplace": null,
+          "billing_address": "Roboticsdna- Godown No. 1, Anant Industrial Estate, 1st Kaman, Dangat Patil Nagar, Shivane, Pune, Maharashtra 411023",
+          "shipping_address": null,
+          "tax_id_gstin": "27AWKPT6559P1ZA",
+          "pan_or_company_id": null,
+          "contact_phone": "+91 8329649598/ +91 7507177602",
+          "contact_email": "info@roboticsdna.in"
+        },
+        "buyer_details": {
+          "customer_name": "Krish Gupta",
+          "customer_company": "Bharati Vidyapeeth's College of Engineering",
+          "customer_type": null,
+          "billing_address": "at boy's hostel of bharati vidyapeeth college of engineering, lavale pune, pune 412115, Maharashtra",
+          "shipping_address": "at boy's hostel of bharati vidyapeeth college of engineering, lavale pune, pune 412115, Maharashtra",
+          "tax_id_gstin": null
+        },
+        "financial_totals": {
+          "gross_amount_pre_discount": null,
+          "total_discount_amount": null,
+          "taxable_amount_subtotal": 7698.66,
+          "total_tax_amount": 1385.78,
+          "shipping_and_handling_charges": null,
+          "other_charges": null,
+          "grand_total": 9084.44,
+          "amount_paid": null,
+          "balance_due": null
+        },
+        "tax_breakdown": {
+          "cgst_amount": 692.89,
+          "sgst_amount": 692.89,
+          "igst_amount": null,
+          "vat_amount": null,
+          "sales_tax_amount": null,
+          "tax_cess_amount": null
+        },
+        "payment_details": {
+          "payment_method": "Manual Bank Transfer",
+          "payment_transaction_id": null,
+          "payment_date": null
+        },
+        "line_items": [
+          {
+            "item_id_or_sku": "RDNA-D17",
+            "description": "MAX485 TTL To",
+            "hsn_sac_code": "8542390",
+            "quantity": 1,
+            "unit_price": 18.64,
+            "discount_amount": null,
+            "taxable_value": 18.64,
+            "tax_percentage": 9.0,
+            "tax_amount": 3.36,
+            "total_item_amount": 22.0
+          },
+          {
+            "item_id_or_sku": "RDNA-C61.3",
+            "description": "APM 2.8 Flight Controller with Built in Compass",
+            "hsn_sac_code": "8473302",
+            "quantity": 1,
+            "unit_price": 5630.0,
+            "discount_amount": null,
+            "taxable_value": 5630.0,
+            "tax_percentage": 9.0,
+            "tax_amount": 1013.4,
+            "total_item_amount": 6643.4
+          },
+          {
+            "item_id_or_sku": null,
+            "description": "APM/Pixhawk Power Module V6.0 Output",
+            "hsn_sac_code": "8479909",
+            "quantity": 1,
+            "unit_price": 448.31,
+            "discount_amount": null,
+            "taxable_value": 448.31,
+            "tax_percentage": 9.0,
+            "tax_amount": 80.7,
+            "total_item_amount": 529.01
+          },
+          {
+            "item_id_or_sku": "RDNA-A316",
+            "description": "Anti-Vibration Shock Absorber for APM/KK/MWC/PixHaw k",
+            "hsn_sac_code": "8543709",
+            "quantity": 1,
+            "unit_price": 148.31,
+            "discount_amount": null,
+            "taxable_value": 148.31,
+            "tax_percentage": 9.0,
+            "tax_amount": 26.7,
+            "total_item_amount": 175.01
+          },
+          {
+            "item_id_or_sku": "RDNA-376.9",
+            "description": "UbloxNEO 7M GPS",
+            "hsn_sac_code": "8526912",
+            "quantity": 1,
+            "unit_price": 1270.34,
+            "discount_amount": null,
+            "taxable_value": 1270.34,
+            "tax_percentage": 9.0,
+            "tax_amount": 228.66,
+            "total_item_amount": 1499.0
+          },
+          {
+            "item_id_or_sku": "RDNA-E479",
+            "description": "ABS Plastic Landing Gear for Quadcopter (Pack of 4)",
+            "hsn_sac_code": "8479904",
+            "quantity": 1,
+            "unit_price": 141.53,
+            "discount_amount": null,
+            "taxable_value": 141.53,
+            "tax_percentage": 9.0,
+            "tax_amount": 25.48,
+            "total_item_amount": 167.01
+          },
+          {
+            "item_id_or_sku": "B239.1",
+            "description": "NE555 SOIC-8 Timer (Pack of 5 ICs)",
+            "hsn_sac_code": null,
+            "quantity": 1,
+            "unit_price": 41.53,
+            "discount_amount": null,
+            "taxable_value": 41.53,
+            "tax_percentage": 9.0,
+            "tax_amount": 7.48,
+            "total_item_amount": 49.01
+          }
+        ],
+        "source_file": "2_dee926b8_receipt20.jpg",
+        "raw_ocr_text_reference": "\"!\nAddress: Roboticsdna- Godown No. 1, Anant Industrial Estate,\n1st Kaman, Dangat Patil Nagar, Shivane, Pune, Maharashtra\n411023\nRoboticsD∩A.In\n0\nMobile: +91 8329649598/ +91 7507177602\n川\nEmail:info@roboticsdna.in\nTax Invoice\nGSTIN: 27AWKPT6559P1ZA\nInvoice #: 097141-2025\nBill to:\nShip to:\nInvoice Date: March 29, 2025\nBharati Vidyapeeth's College of\nBharati Vidyapeeth's\nOrder Date: March 29, 2025\nEngineering Lavale Pune\nCollege of Engineering\nOrder Number: 316688\nKrish Gupta\nLavale Pune\nPayment Method: Manual Bank Transfer\nat boy's hostel of bharati\nKrish Gupta\nShipping Method: Store Pickup (Pune Office) (9:15 AM to 5:30\nvidyapeeth college of engineering\nat boy's hostel of\nPM)\nlavale pune\nbharati vidyapeeth\npune 412115\ncollege of engineering\nMaharashtra\nlavale pune\nPhone:+917219570360\npune 412115\nMaharashtra\nS.No.\nDescription\nSKU\nHSN\nUnit Price\nQt\nAmount\nSGST\nCGST\nAmount\nV\n1\nMAX485 TTL To\nRDNA-D17\n8542390\n18.64\n1\n18.64\n1.68\n1.68\n22.00\nRS485\n0\n(9%)\n(9%)\n2\nAPM 2.8 Flight\nRDNA-C61.3\n8473302\n天5,630.00\n1\n天5,630.00\n天506.70\n天506.70\n6,643.40\nController with Built\n0\n(9%)\n(9%)\nin Compass\n3\nAPM/Pixhawk Power\nRDNA-\n8479909\n448.31\n1\n448.31\n40.35\n40.35\n529.01\nModule V6.0 Output\nB374.1\n0\n(9%)\n(9%)\nBEC 3A XT60 Plug\n28V90A\n4\nAnti-Vibration Shock\nRDNA-A316\n8543709\n148.31\n1\n148.31\n13.35\n天13.35\n175.01\nAbsorber for\n9\n(9%)\n(9%)\nAPM/KK/MWC/PixHaw\nk\n5\nUbloxNEO 7M GPS\nRDNA-376.9\n8526912\n1,270.34\n1\n1,270.34\n114.33\n114.33\n天1,499.00\nWith Compass for\n0\n(9%)\n(9%)\nAPM 2.6/2.8 and\nPixhau 2.4.6/2.4.8\n6\nABS Plastic Landing\nRDNA-E479\n8479904\n141.53\n1\n₹141.53\n12.74\n12.74\n167.01\nGear for Quadcopter\n0\n(9%)\n(9%)\n(Pack of 4)\n7\nNE555 SOIC-8 Timer\nRDNA-\n8542390\n41.53\n1\n41.53\n3.74\n3.74\n49.01\n(Pack of 5 ICs)\nB239.1\n0\n(9%)\n(9%)\nSubtotal:\n7,698.66\nShipping:\nStore Pickup (Pune Office)\n(9:15 AM to 5:30 PM)\nCGST:\n692.89\nSGST:\n692.89\nTotal:\n9,084.44\nAmount in Words :NInE THOUsAnD, EIGHTY-FOuR RUPEeS, FORTY-FOUR PAIsE OnLY\n1of2",
+        "validation": {
+          "status": "VALID",
+          "line_items_count": 7,
+          "valid_line_items": 7,
+          "line_items_total": 9084.44,
+          "grand_total": 9084.44,
+          "line_items_difference": 0.0,
+          "accounting_total": 9084.44,
+          "accounting_difference": 0.0,
+          "tax_breakdown_total": 1385.78,
+          "tax_difference": 0.0
+        },
+        "document_hash": "b9367464dfa0f96ab34718dba765ffe7c4cc5b974fa57362effb88f55d1ad933",
+        "request_id": "d980a4192f80",
+        "data_source": "ai_ocr",
+        "user_id": "krish"
+      }
+    ]
+  }
+]

@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>aiCFO — Receipt Vault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #EFEDDF;
+      --card: #FBFAF2;
+      --line: #D8DECB;
+      --strong: #C3CBB4;
+      --ink: #20301F;
+      --soft: #57644F;
+      --faint: #8B9682;
+      --stamp: #A5382B;
+      --brass: #A9822F;
+      --forest: #20402F;
+      --shadow: rgba(32, 48, 31, 0.18);
+      --ink-soft: #57644F;
+      --ink-faint: #8B9682;
+      --line-soft: #D8DECB;
+      --mint: #5F7A5A;
+      --paper-card: #FBFAF2;
+      --focus: #A9822F;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--paper) repeating-linear-gradient(to bottom, transparent 0 30px, #E4E2D2 30px 31px);
+      color: var(--ink);
+      font-family: 'Work Sans', sans-serif;
+      padding: 32px 16px 64px;
+    }
+
+    .sheet {
+      max-width: 1100px;
+      margin: auto;
+      background: var(--card);
+      padding: clamp(24px, 4vw, 52px);
+      border-radius: 4px;
+      box-shadow: 0 18px 44px -18px rgba(32,48,31,.14);
+    }
+
+    .head {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      border-bottom: 1.5px solid var(--strong);
+      padding-bottom: 22px;
+      margin-bottom: 28px;
+    }
+    /* ============================================================
+       NAVBAR
+       ============================================================ */
+    .navbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      width: min(1120px, calc(100% - 32px));
+      margin: 16px auto 0;
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 10px 12px 10px 16px;
+      background: rgba(251, 250, 242, 0.96);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: 0 12px 32px -20px var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--ink);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--forest);
+      color: #F3F1E3;
+      border-radius: 4px;
+      font-family: 'Spectral', serif;
+      font-size: 20px;
+      font-weight: 700;
+      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .brand-copy { display: flex; flex-direction: column; justify-content: center; }
+    .brand-name { font-family: 'Spectral', serif; font-size: 21px; font-weight: 700; line-height: 1; letter-spacing: -0.01em; }
+    .brand-tagline { margin-top: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: .13em; text-transform: uppercase; color: var(--ink-faint); }
+
+    .nav-links { display: flex; align-items: center; gap: 3px; }
+    .nav-link {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 13px;
+      border-radius: 4px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .045em;
+      text-transform: uppercase;
+      transition: color .2s ease, background .2s ease;
+    }
+
+    .nav-link:hover { color: var(--ink); background: var(--paper); }
+    .nav-link.active { color: var(--stamp); background: #F3EFE3; }
+    .nav-link.active::after {
+      content: "";
+      position: absolute;
+      left: 13px;
+      right: 13px;
+      bottom: 4px;
+      height: 1px;
+      background: var(--stamp);
+      opacity: .7;
+    }
+
+    .nav-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 15px; line-height: 1; }
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding-left: 10px;
+      margin-left: 5px;
+      border-left: 1px solid var(--line-soft);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      color: var(--ink-faint);
+      white-space: nowrap;
+    }
+
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 3px rgba(95, 122, 90, 0.10); }
+    .nav-toggle {
+      display: none;
+      width: 40px;
+      height: 38px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--paper);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 19px;
+    }
+    .nav-toggle:hover { background: var(--line-soft); }
+    .nav-toggle:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+
+    .eyebrow {
+      font: 11px 'IBM Plex Mono';
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--brass);
+      margin-bottom: 8px;
+    }
+
+    .head h1 {
+      font: 700 clamp(28px, 4vw, 38px) 'Spectral';
+      margin: 0;
+    }
+
+    .meta {
+      font: 11px 'IBM Plex Mono';
+      color: var(--faint);
+      margin-top: 8px;
+    }
+
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      border: 1px solid var(--strong);
+      background: white;
+      color: var(--ink);
+      padding: 10px 15px;
+      border-radius: 4px;
+      text-decoration: none;
+      font: 600 11px 'IBM Plex Mono';
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .btn.primary {
+      background: var(--forest);
+      color: white;
+      border-color: var(--forest);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar input, .toolbar select {
+      padding: 11px 12px;
+      border: 1px solid var(--strong);
+      border-radius: 4px;
+      background: white;
+      color: var(--ink);
+      font: 13px 'Work Sans';
+    }
+
+    .toolbar input { flex: 1; min-width: 220px; }
+    .count { font: 11px 'IBM Plex Mono'; color: var(--soft); margin-left: auto; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 5px;
+      overflow: hidden;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(32,48,31,.12);
+    }
+
+    .thumb {
+      height: 220px;
+      background: var(--paper);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .info { padding: 14px; }
+    .name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .date { font: 10.5px 'IBM Plex Mono'; color: var(--faint); margin-top: 5px; }
+    .size { font: 10px 'IBM Plex Mono'; color: var(--faint); margin-top: 4px; }
+    .buttons { display: flex; gap: 7px; margin-top: 13px; }
+
+    .buttons a, .buttons button {
+      flex: 1;
+      text-align: center;
+      padding: 8px 7px;
+      border-radius: 3px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      text-decoration: none;
+      font: 600 10px 'IBM Plex Mono';
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .buttons button.delete { color: var(--stamp); }
+
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      border: 1px dashed var(--strong);
+      border-radius: 5px;
+      color: var(--soft);
+    }
+
+    
+    /* ============================================================
+   UPLOAD CARD & HEADER
+   ============================================================ */
+
+    .upload-card {
+    margin-bottom: 28px;
+    padding: 24px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    }
+
+    .upload-header {
+    margin-bottom: 18px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed var(--line);
+    }
+
+    .upload-header .eyebrow {
+    margin-bottom: 6px;
+    text-align: left;
+    font-size: 9px;
+    }
+
+    .upload-header h2 {
+    margin: 0;
+    font-family: 'Spectral', serif;
+    font-size: 26px;
+    color: var(--ink);
+    }
+
+    .upload-header p {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--soft);
+    line-height: 1.5;
+    }
+
+    /* ============================================================
+    UPLOAD DROPZONE
+    ============================================================ */
+
+    .dropzone {
+    position: relative;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 25px;
+    border: 1.5px dashed var(--strong);
+    border-radius: 5px;
+    background: var(--card);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    }
+
+    .dropzone:hover {
+    border-color: var(--brass);
+    background: #F8F6EC;
+    }
+
+    .dropzone.drag {
+    border-color: var(--stamp);
+    background: #F8EEEA;
+    transform: translateY(-2px);
+    }
+
+    .dropzone input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    }
+
+    .upload-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--forest);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    margin-bottom: 4px;
+    }
+
+    .upload-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    }
+
+    .upload-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--faint);
+    letter-spacing: 0.03em;
+    }
+
+    /* ============================================================
+    FILE INFO, BUTTON & STATUS
+    ============================================================ */
+
+    .file-info {
+    margin-top: 10px;
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--card);
+    color: var(--soft);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    display: none;
+    }
+
+    .file-info.show {
+    display: block;
+    }
+
+    .btn-submit {
+    width: 100%;
+    margin-top: 12px;
+    padding: 13px 16px;
+    border: none;
+    border-radius: 4px;
+    background: var(--forest);
+    color: #fff;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    transition: background 0.2s ease, opacity 0.2s ease;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+    background: #152B20;
+    }
+
+    .btn-submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    }
+
+    .upload-status {
+    margin-top: 10px;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--soft);
+    }
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 800px) {
+      .navbar { top: 10px; margin-top: 10px; }
+      .nav-status { display: none; }
+      .nav-toggle { display: flex; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0; right: 0;
+        padding: 8px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 3px;
+        background: var(--paper-card);
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        box-shadow: 0 18px 35px -18px var(--shadow);
+      }
+      .nav-links.open { display: flex; }
+      .nav-link { padding: 12px 13px; }
+      .nav-link.active::after { display: none; }
+      main { padding-top: 42px; }
+    }
+
+    @media (max-width: 600px) {
+      .container { width: min(100% - 24px, 620px); }
+      .navbar { width: calc(100% - 24px); min-height: 62px; padding: 9px 10px 9px 12px; }
+      .brand-mark { width: 35px; height: 35px; font-size: 18px; }
+      .brand-name { font-size: 19px; }
+      .brand-tagline { display: none; }
+      main { padding: 36px 0 60px; }
+      .page-header { margin-bottom: 22px; }
+      .page-header h1 { font-size: 34px; }
+      .page-description { font-size: 13px; padding: 0 8px; }
+      .card { padding: 32px 22px 25px; }
+      .stamp { width: 68px; height: 68px; right: 12px; top: -22px; font-size: 7px; }
+      .tabs { padding: 0 5px; }
+      .tab { padding: 10px 14px 13px; font-size: 9.5px; }
+      .grid2, .info-strip { grid-template-columns: 1fr; gap: 0; }
+      .info-item { display: flex; align-items: center; justify-content: space-between; text-align: left; padding: 10px 4px; }
+      .info-label { margin: 0; }
+    }
+
+    @media (max-width: 400px) {
+      .brand-copy { display: none; }
+      .navbar { justify-content: space-between; }
+      .page-header h1 { font-size: 30px; }
+      .card { padding: 30px 18px 23px; }
+      .dropzone { min-height: 165px; padding: 24px 12px; }
+      .tab { padding: 9px 11px 12px; font-size: 8.5px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    @media (max-width: 600px) {
+    .count { width: 100%; margin-left: 0; }
+    .thumb { height: 190px; }
+    }
+  </style>
+</head>
+<body>
+<div class="sheet">
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/" class="brand" aria-label="aiCFO Dashboard">
+      <div class="brand-mark">C</div>
+      <div class="brand-copy">
+        <div class="brand-name">aiCFO</div>
+        <div class="brand-tagline">Intelligent Finance</div>
+      </div>
+    </a>
+
+    <div class="nav-links" id="navLinks">
+      <a href="/" class="nav-link active">
+        <span class="nav-icon">⌂</span> Dashboard
+      </a>
+      <a href="/auth" class="nav-link">
+        <span class="nav-icon">▤</span> Login / Register
+      </a>
+      <a href="/receipts" class="nav-link">
+        <span class="nav-icon">▣</span> Receipt Vault
+      </a>
+      <a href="/ledger" class="nav-link">
+      <span class="nav-icon">▤</span> Ledger
+      </a>
+      <div class="nav-status">
+        <span class="status-dot"></span> Secure
+      </div>
+      
+    </div>
+
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="Open navigation" aria-expanded="false">
+      ☰
+    </button>
+  </nav>
+
+  <div class="head">
+    <div>
+      <div class="eyebrow">aiCFO · Document Storage</div>
+      <h1>Receipt Vault</h1>
+      <div class="meta">Your original receipts, safely stored with your account.</div>
+    </div>
+    <div class="actions">
+      <a class="btn" href="/">← Dashboard</a>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input id="search" type="search" placeholder="Search receipt filename...">
+    <select id="sort">
+      <option value="newest">Newest first</option>
+      <option value="oldest">Oldest first</option>
+      <option value="name">Name A–Z</option>
+    </select>
+    <span class="count" id="count">Loading...</span>
+  </div>
+
+  <div id="empty" class="empty" style="display:none">
+    <strong>No receipts stored yet.</strong><br><br>
+    Upload a receipt from the dashboard and it will automatically appear here.
+  </div>
+
+  <div>
+  <div class="upload-card">
+  <div class="upload-header">
+    <div>
+      <div class="eyebrow">Personal Upload</div>
+      <h2>Store a receipt</h2>
+      <p>Upload a receipt directly to your Receipt Vault so you never lose it.</p>
+    </div>
+  </div>
+
+  <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+    <label class="dropzone" id="dropzone" for="fileInput">
+      <div class="upload-icon">↑</div>
+      <div class="upload-title">Click to browse or drag & drop</div>
+      <div class="upload-hint">JPG, PNG, WEBP or GIF · Maximum 10 MB</div>
+      <input
+        type="file"
+        id="fileInput"
+        name="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        required
+      >
+    </label>
+
+    <div id="file-info" class="file-info"></div>
+    <button type="submit" class="btn-submit" id="submitBtn" disabled>Save to Receipt Vault</button>
+    <div id="status" class="upload-status"></div>
+  </form>
+</div>
+
+<div id="grid" class="grid"></div>
+</div>
+
+<script>
+let receipts = [];
+
+function formatDate(value) {
+  try {
+    return new Date(value).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  } catch {
+    return value || '';
+  }
+}
+
+function formatSize(bytes) {
+  if (!bytes) return '';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let size = bytes, index = 0;
+  while (size >= 1024 && index < units.length - 1) {
+    size /= 1024;
+    index++;
+  }
+  return `${size.toFixed(1)} ${units[index]}`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  }[c]));
+}
+
+function render() {
+  const query = document.getElementById('search').value.trim().toLowerCase();
+  const sort = document.getElementById('sort').value;
+
+  let rows = receipts.filter(r => (r.original_filename || '').toLowerCase().includes(query));
+
+  rows.sort((a, b) => {
+    if (sort === 'name') {
+      return (a.original_filename || '').localeCompare(b.original_filename || '');
+    }
+    const dateA = new Date(a.uploaded_at).getTime();
+    const dateB = new Date(b.uploaded_at).getTime();
+    return sort === 'oldest' ? dateA - dateB : dateB - dateA;
+  });
+
+  document.getElementById('count').textContent = `${rows.length} receipt${rows.length === 1 ? '' : 's'}`;
+  document.getElementById('empty').style.display = rows.length ? 'none' : 'block';
+
+  document.getElementById('grid').innerHTML = rows.map(r => `
+    <article class="card">
+      <div class="thumb">
+        <img src="/receipts/${encodeURIComponent(r.receipt_id)}" alt="${escapeHtml(r.original_filename)}" loading="lazy">
+      </div>
+      <div class="info">
+        <div class="name" title="${escapeHtml(r.original_filename)}">${escapeHtml(r.original_filename)}</div>
+        <div class="date">Stored ${formatDate(r.uploaded_at)}</div>
+        <div class="size">${formatSize(r.size_bytes)}</div>
+        <div class="buttons">
+          <a href="/receipts/${encodeURIComponent(r.receipt_id)}" target="_blank" rel="noopener">View</a>
+          <a href="/receipts/${encodeURIComponent(r.receipt_id)}/download">Download</a>
+          <button class="delete" onclick="removeReceipt('${r.receipt_id}')">Delete</button>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
+/* ============================================================
+   MANUAL RECEIPT UPLOAD
+   ============================================================ */
+
+const uploadForm = document.getElementById('uploadForm');
+const fileInput = document.getElementById('fileInput');
+const dropzone = document.getElementById('dropzone');
+const fileInfo = document.getElementById('file-info');
+const submitBtn = document.getElementById('submitBtn');
+const status = document.getElementById('status');
+
+let selectedFile = null;
+
+/* ============================================================
+   FILE SELECTION & VALIDATION
+   ============================================================ */
+
+function selectFile(file) {
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    status.textContent = 'Please select an image file.';
+    submitBtn.disabled = true;
+    return;
+  }
+
+  const maxSize = 10 * 1024 * 1024; // 10 MB limit
+  if (file.size > maxSize) {
+    status.textContent = 'File is too large. Maximum size is 10 MB.';
+    submitBtn.disabled = true;
+    return;
+  }
+
+  selectedFile = file; 
+  fileInfo.innerHTML = `<strong>${escapeHtml(file.name)}</strong> · ${formatSize(file.size)}`;
+  fileInfo.classList.add('show');
+  status.textContent = '';
+  submitBtn.disabled = false;
+}
+
+/* ============================================================
+   EVENT LISTENERS & DRAG-AND-DROP
+   ============================================================ */
+
+fileInput.addEventListener('change', function () {
+  if (this.files.length > 0) {
+    selectFile(this.files[0]);
+  }
+});
+
+['dragenter', 'dragover'].forEach(eventName => {
+  dropzone.addEventListener(eventName, event => {
+    event.preventDefault();
+    event.stopPropagation();
+    dropzone.classList.add('drag');
+  });
+});
+
+['dragleave', 'dragend'].forEach(eventName => {
+  dropzone.addEventListener(eventName, event => {
+    event.preventDefault();
+    event.stopPropagation();
+    dropzone.classList.remove('drag');
+  });
+});
+
+dropzone.addEventListener('drop', event => {
+  event.preventDefault();
+  event.stopPropagation();
+  dropzone.classList.remove('drag');
+
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+
+  selectFile(file);
+
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  fileInput.files = dataTransfer.files;
+});
+
+uploadForm.addEventListener('submit', function () {
+  if (!selectedFile) {
+    status.textContent = 'Please select a receipt first.';
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving Receipt...';
+  status.textContent = 'Uploading your receipt to the vault...';
+});
+async function loadReceipts() {
+  try {
+    const res = await fetch('/api/receipts');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    receipts = data.receipts || [];
+    render();
+  } catch {
+    document.getElementById('count').textContent = 'Unable to load';
+  }
+}
+
+async function removeReceipt(id) {
+  if (!confirm('Delete this stored receipt? This removes the saved copy from your Receipt Vault.')) return;
+  try {
+    const res = await fetch(`/api/receipts/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    if (res.ok) {
+      receipts = receipts.filter(r => r.receipt_id !== id);
+      render();
+    } else {
+      alert('Could not delete the receipt.');
+    }
+  } catch {
+    alert('Something went wrong.');
+  }
+}
+const navToggle = document.getElementById('navToggle');
+const navLinks = document.getElementById('navLinks');
+
+navToggle.addEventListener('click', function () {
+    navLinks.classList.toggle('open');
+
+    const isOpen = navLinks.classList.contains('open');
+
+    navToggle.setAttribute('aria-expanded', isOpen);
+    navToggle.setAttribute(
+        'aria-label',
+        isOpen ? 'Close navigation' : 'Open navigation'
+    );
+});
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('sort').addEventListener('change', render);
+loadReceipts();
+</script>
+</body>
+</html>

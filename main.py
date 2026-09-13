@@ -1,33 +1,52 @@
 # pip install sqlalchemy
 from fastapi import FastAPI, File, UploadFile, Request, Form, Depends
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse,FileResponse
 from fastapi.staticfiles import StaticFiles
 from typing import List, Optional
 import shutil
 from fastapi import Body
 import os
+import asyncio
+import os
+import shutil
+import uuid
+from pathlib import Path
 import pandas as pd
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
-
+from pathlib import Path
 # Auth & Security Imports
 import jwt
+import json
 import bcrypt
-
+from dotenv import load_dotenv
+from processing_history import (
+    load_processing_history,
+    get_processing_batch,
+    save_processing_batch,
+)
+load_dotenv() 
 # Database Imports (SQLAlchemy)
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 
 # Your custom imports (Make sure these files exist in your project)
-from expense_processing import load_all_expenses, save_expenses, format_manual_entry
+from expense_processing import load_all_expenses,save_expenses,format_manual_entry
+
 from report_utils import render_report_response
 from ocr_extraction import process_invoice 
 from google import genai
-from dotenv import load_dotenv
 from fastapi.templating import Jinja2Templates
+from receipt_storage import (
+    save_receipt,
+    list_receipts,
+    get_receipt,
+    get_receipt_path,
+    delete_receipt,
+    ALLOWED_MIME_TYPES,
+)
 
-load_dotenv()
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
@@ -43,6 +62,13 @@ os.makedirs("temp_uploads", exist_ok=True)
 os.makedirs("data", exist_ok=True)
 
 # ==================== DATABASE SETUP (SQLAlchemy) ====================
+
+
+TEMP_UPLOAD_DIR = Path("temp_uploads")
+TEMP_UPLOAD_DIR.mkdir(
+    parents=True,
+    exist_ok=True,
+)
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./data/users.db"
 
@@ -202,68 +228,343 @@ async def upload_page(request: Request, db: Session = Depends(get_db)):
         context={"username": user}
     )
 
-executor = ThreadPoolExecutor(max_workers=4)
+
+# ============================================================
+# REPORTS PAGE
+# ============================================================
+
+@app.get("/reports", response_class=HTMLResponse)
+async def reports_page(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+
+    # Check login
+    user = get_current_user(request, db)
+
+    if not user:
+        return RedirectResponse(
+            url="/auth",
+            status_code=302
+        )
+
+    # Load all expenses belonging to current user
+    expenses = load_all_expenses(user)
+
+    # If there are no expenses
+    if not expenses:
+        return HTMLResponse(
+            content="""
+            <html>
+            <head>
+                <title>aiCFO — Reports</title>
+            </head>
+
+            <body>
+                <h2>No expenses found</h2>
+
+                <p>
+                    Upload a receipt or add a manual expense
+                    to generate your report.
+                </p>
+
+                <a href="/">
+                    ← Back to Dashboard
+                </a>
+            </body>
+            </html>
+            """
+        )
+
+    # Generate/render report
+    return render_report_response(
+        request,
+        expenses
+    )
+
+executor = ThreadPoolExecutor(max_workers=2)
 
 @app.post("/generate-report", response_class=HTMLResponse)
-async def generate_report(request: Request, receipts: List[UploadFile] = File(...), db: Session = Depends(get_db)):
-    """Receives files, processes them through PaddleOCR, tags them, and renders report."""
+async def generate_report(
+    request: Request,
+    receipts: List[UploadFile] = File(...),
+    db: Session = Depends(get_db),
+):
+    # 1. Authentication
     user = get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/auth", status_code=302)
 
+    # 2. Request ID & Temp Directory Setup
+    request_id = uuid.uuid4().hex[:12]
+    safe_user = "".join(c for c in str(user) if c.isalnum() or c in ("_", "-"))
+    request_dir = TEMP_UPLOAD_DIR / safe_user / request_id
+    request_dir.mkdir(parents=True, exist_ok=True)
+
+    # 3. Save Uploaded Files
     temp_paths = []
-    for file in receipts:
-        if not file.filename:
-            continue
-        temp_file_path = f"temp_uploads/{file.filename}"
+    valid_uploaded_files = [r for r in receipts if r.filename]
+
+    for index, file in enumerate(valid_uploaded_files):
+        original_name = Path(file.filename).name
+        unique_name = f"{index}_{uuid.uuid4().hex[:8]}_{original_name}"
+        temp_file_path = request_dir / unique_name
+
         with open(temp_file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-        temp_paths.append(temp_file_path)
-        
-    loop = asyncio.get_event_loop()
-    tasks = [
-        loop.run_in_executor(executor, process_invoice, path)
-        for path in temp_paths
-    ]
-    extracted_results = await asyncio.gather(*tasks)
 
+        temp_paths.append(str(temp_file_path))
+
+    if not temp_paths:
+        return render_report_response(request, [])
+
+    # 4. Permanent Receipt Storage
+    permanent_receipts = {}
+    for temp_path, uploaded in zip(temp_paths, valid_uploaded_files):
+        try:
+            receipt_record = save_receipt(
+                username=user,
+                source_path=temp_path,
+                original_filename=uploaded.filename,
+                request_id=request_id,
+            )
+            permanent_receipts[Path(uploaded.filename).name] = receipt_record
+        except Exception as exc:
+            print(f"⚠️ Receipt storage error: {exc}")
+
+    # 5. OCR Processing
+    from ocr_extraction import process_invoices
+
+    loop = asyncio.get_running_loop()
+    all_extracted_data_raw = await loop.run_in_executor(
+        executor, process_invoices, temp_paths
+    )
+
+    # 6. Collect Results & Link Receipts
     all_extracted_data = []
-    for extracted_json in extracted_results:
-        if extracted_json:
-            extracted_json["data_source"] = "ai_ocr"
-            # Optional: Link expense to user
-            extracted_json["user"] = user 
-            all_extracted_data.append(extracted_json)
-            
+    for result in all_extracted_data_raw:
+        if not result:
+            continue
+
+        result["request_id"] = request_id
+        result["data_source"] = "ai_ocr"
+        result["user_id"] = user
+
+        if source_file := result.get("source_file"):
+            source_filename = Path(source_file).name
+            if receipt_record := permanent_receipts.get(source_filename):
+                result["receipt_id"] = receipt_record["receipt_id"]
+                result["receipt_original_filename"] = receipt_record["original_filename"]
+
+        all_extracted_data.append(result)
+
+    if not all_extracted_data:
+        return render_report_response(request, [])
+
+    # 7. Persist & Render
     save_expenses(all_extracted_data)
+    save_processing_batch(username=user, expenses=all_extracted_data, batch_id=request_id)
+
+    extracted_path = request_dir / "extracted.json"
+    with open(extracted_path, "w", encoding="utf-8") as file:
+        json.dump(all_extracted_data, file, indent=4, ensure_ascii=False)
+
     return render_report_response(request, all_extracted_data)
+
+
+@app.get("/receipts", response_class=HTMLResponse)
+async def receipts_page(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request, db)
+    if not user:
+        return RedirectResponse(url="/auth", status_code=302)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="receipts.html",
+        context={"username": user},
+    )
+
+
+# ============================================================
+# GET RECEIPT LIST
+# ============================================================
+
+
+@app.get("/api/receipts")
+async def api_list_receipts(request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request, db)
+    if not user:
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
+
+    return {"success": True, "receipts": list_receipts(user)}
+
+
+# ============================================================
+# VIEW RECEIPT
+# ============================================================
+
+
+@app.get("/receipts/{receipt_id}")
+async def view_receipt(
+    receipt_id: str, request: Request, db: Session = Depends(get_db)
+):
+    user = get_current_user(request, db)
+    if not user:
+        return RedirectResponse(url="/auth", status_code=302)
+
+    path = get_receipt_path(user, receipt_id)
+    record = get_receipt(user, receipt_id)
+    if not path or not record:
+        return JSONResponse(status_code=404, content={"error": "Receipt not found"})
+
+    return FileResponse(
+        path=str(path),
+        media_type=record.get("mime_type", "application/octet-stream"),
+        filename=record.get("original_filename", path.name),
+        content_disposition_type="inline",
+    )
+
+
+# ============================================================
+# DOWNLOAD RECEIPT
+# ============================================================
+
+
+@app.get("/receipts/{receipt_id}/download")
+async def download_receipt(
+    receipt_id: str, request: Request, db: Session = Depends(get_db)
+):
+    user = get_current_user(request, db)
+    if not user:
+        return RedirectResponse(url="/auth", status_code=302)
+
+    path = get_receipt_path(user, receipt_id)
+    record = get_receipt(user, receipt_id)
+    if not path or not record:
+        return JSONResponse(status_code=404, content={"error": "Receipt not found"})
+
+    return FileResponse(
+        path=str(path),
+        media_type=record.get("mime_type", "application/octet-stream"),
+        filename=record.get("original_filename", path.name),
+        content_disposition_type="attachment",
+    )
+
+
+@app.get("/ledger", response_class=HTMLResponse)
+async def ledger_history(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    user = get_current_user(request, db)
+
+    if not user:
+        return RedirectResponse(
+            url="/auth",
+            status_code=302
+        )
+
+    history = load_processing_history(user)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="ledger_history.html",
+        context={
+            "request": request,
+            "username": user,
+            "history": history,
+        }
+    )
+
+@app.get("/ledger/{batch_id}",response_class=HTMLResponse)
+async def ledger_detail(batch_id:str, request:Request, db:Session=Depends(get_db)):
+    user=get_current_user(request,db)
+
+    if not user:
+        return RedirectResponse( url="/auth",status_code=302)
+
+    batch=get_processing_batch(username=user,batch_id=batch_id)
+
+    if not batch:
+        return HTMLResponse(
+            "<h1>Processing record not found</h1>",
+            status_code=404
+        )
+    return templates.TemplateResponse(
+        request=request, name="ledger_detail.html",
+        context={
+            "request":request,
+            "username":user,
+            "batch":batch
+        }
+    )
+
+# ============================================================
+# DELETE RECEIPT
+# ============================================================
+
+
+@app.delete("/api/receipts/{receipt_id}")
+async def remove_receipt(
+    receipt_id: str, request: Request, db: Session = Depends(get_db)
+):
+    user = get_current_user(request, db)
+    if not user:
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
+
+    if not delete_receipt(user, receipt_id):
+        return JSONResponse(status_code=404, content={"error": "Receipt not found"})
+
+    return {"success": True, "message": "Receipt deleted successfully"}
+
 
 @app.post("/add-manual-expense", response_class=HTMLResponse)
 async def add_manual_expense(
     request: Request,
-    merchant_name: str = Form(...),
-    expense_date: str = Form(...),
-    grand_total: float = Form(...),
-    category: str = Form("General"),
-    description: Optional[str] = Form(None),
+    merchant_name: List[str] = Form(...),
+    expense_date: List[str] = Form(...),
+    grand_total: List[float] = Form(...),
+    category: List[str] = Form(...),
+    description: Optional[List[str]] = Form(None),
     db: Session = Depends(get_db)
 ):
-    """Receives human fallback form submission."""
+    """Receives multiple manual expense entries at once."""
     user = get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/auth", status_code=302)
 
-    manual_data = format_manual_entry(
-        merchant=merchant_name,
-        date=expense_date,
-        total=grand_total,
-        category=category,
-        description=description
-    )
-    manual_data["user"] = user
+    descriptions = description or [""] * len(merchant_name)
+    manual_entries = []
 
-    save_expenses([manual_data])
-    return render_report_response(request, [manual_data])
+    # Iterate through all submitted rows
+    for i in range(len(merchant_name)):
+        m = merchant_name[i].strip()
+        if not m:
+            continue
+
+        d = expense_date[i] if i < len(expense_date) else ""
+        t = grand_total[i] if i < len(grand_total) else 0.0
+        c = category[i] if i < len(category) else "General"
+        desc = descriptions[i] if i < len(descriptions) else None
+
+        entry = format_manual_entry(
+            merchant=m,
+            date=d,
+            total=t,
+            category=c,
+            description=desc
+        )
+        entry["user_id"] = user
+        manual_entries.append(entry)
+
+    if not manual_entries:
+        return RedirectResponse(url="/", status_code=303)
+
+    # Save to user expenses and archive into processing ledger
+    save_expenses(manual_entries)
+    save_processing_batch(username=user, expenses=manual_entries)
+
+    return render_report_response(request, manual_entries)
 
 @app.post("/api/chat")
 async def chat_with_cfo(request: Request, payload: dict = Body(...), db: Session = Depends(get_db)):
@@ -275,7 +576,7 @@ async def chat_with_cfo(request: Request, payload: dict = Body(...), db: Session
     if not user_message:
         return JSONResponse(status_code=400, content={"error": "Message is required"})
 
-    expenses = load_all_expenses()
+    expenses = load_all_expenses(user)
     
     # Optional: Filter expenses by the logged-in user if your JSON handles multiple users
     # expenses = [e for e in expenses if e.get("user") == user]
@@ -314,9 +615,69 @@ async def chat_with_cfo(request: Request, payload: dict = Body(...), db: Session
 
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.6-flash',
             contents=prompt
         )
         return {"reply": response.text}
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+
+@app.post("/upload")
+async def upload_receipt(
+    request: Request,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    # 1. Get logged-in user
+    user = get_current_user(request, db)
+    if not user:
+        return RedirectResponse(url="/auth", status_code=302)
+
+    # 2. Check file presence
+    if not file.filename:
+        return RedirectResponse(url="/receipts?error=no_file", status_code=303)
+
+    # 3. Validate allowed file types
+    allowed_types = {
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+    }
+    if file.content_type not in allowed_types:
+        return RedirectResponse(url="/receipts?error=invalid_file", status_code=303)
+
+    # 4. Safe original filename & temporary storage setup
+    original_filename = Path(file.filename).name
+    temp_dir = Path("data/temp_uploads")
+    temp_dir.mkdir(parents=True, exist_ok=True)
+
+    temp_path = temp_dir / f"{uuid.uuid4().hex}_{original_filename}"
+
+    try:
+        # 5. Save uploaded file temporarily
+        with open(temp_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        # 6. Permanent user-specific storage
+        receipt_record = save_receipt(
+            username=str(user),
+            source_path=str(temp_path),
+            original_filename=original_filename,
+            request_id=uuid.uuid4().hex[:12],
+        )
+
+        print(f"✅ Receipt uploaded by user {user}: {original_filename}")
+        return RedirectResponse(url="/receipts?uploaded=success", status_code=303)
+
+    except Exception as exc:
+        print(f"❌ Receipt upload failed for user {user}: {exc}")
+        return RedirectResponse(url="/receipts?error=upload_failed", status_code=303)
+
+    finally:
+        # 7. Clean up temporary file
+        try:
+            if temp_path.exists():
+                temp_path.unlink()
+        except OSError as exc:
+            print(f"⚠️ Could not delete temporary file: {exc}")

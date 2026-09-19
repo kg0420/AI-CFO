@@ -1,210 +1,202 @@
-# 🤖 AI CFO — Intelligent Expense & Financial Dashboard
+<div align="center">
 
-[![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688.svg)](https://fastapi.tiangolo.com/)
-[![PaddleOCR](https://img.shields.io/badge/PaddleOCR-Powered-orange.svg)](https://github.com/PaddlePaddle/PaddleOCR)
-[![Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-8A2BE2.svg)](https://ai.google.dev/)
+# 🤖 AI CFO
 
-AI CFO is an end-to-end intelligent personal finance application that transforms raw, unstructured receipts into actionable financial insights.
+### Turn a pile of receipts into a smart financial dashboard, and chat with your money.
 
-The application combines **PaddleOCR** for automated receipt extraction with **Google Gemini 2.5 Flash** for AI-powered financial analysis and conversational assistance. Users can upload receipts, track expenses, visualize spending patterns, and interact with an AI financial advisor that understands their ledger.
+**Snap. Upload. Understand.** AI CFO reads your receipts with OCR, visualizes your spending, and lets you ask an AI advisor questions about your own ledger.
+
+<br>
+
+[![Python](https://img.shields.io/badge/Python-3.9--3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![PaddleOCR](https://img.shields.io/badge/PaddleOCR-Powered-FF6F00?style=for-the-badge)](https://github.com/PaddlePaddle/PaddleOCR)
+[![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-8A2BE2?style=for-the-badge&logo=googlegemini&logoColor=white)](https://ai.google.dev/)
+[![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white)](https://plotly.com/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](#-license)
+
+<!-- Add your live link once deployed, e.g.:
+[🚀 Live Demo](https://your-app.onrender.com) · -->
+[🐛 Report a Bug](https://github.com/kg0420/AI-CFO/issues) · [✨ Request a Feature](https://github.com/kg0420/AI-CFO/issues)
+
+</div>
+
+---
+
+## 📑 Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [How It Works](#-how-it-works)
+- [Tech Stack](#-tech-stack)
+- [Quick Start](#-quick-start)
+- [API Reference](#-api-reference)
+- [Ask the AI CFO](#-ask-the-ai-cfo)
+- [Project Structure](#-project-structure)
+- [Authentication & Security](#-authentication--security)
+- [Deployment](#-deployment-on-render)
+- [Roadmap](#-roadmap)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
+## 🌟 Overview
+
+Managing expenses usually means shoeboxes of receipts and spreadsheets nobody wants to update. **AI CFO** removes that friction.
+
+Upload receipt images and **PaddleOCR** pulls out the merchant, date, tax, totals and line items. **Pandas** cleans the data and **Plotly** turns it into interactive charts. A built-in advisor powered by **Google Gemini 2.5 Flash** answers questions grounded in *your* actual ledger.
+
+| 📥 Input | ⚙️ Processing | 📤 Output |
+| :--- | :--- | :--- |
+| Receipt images or manual entries | OCR → normalization → analytics | Dashboards and AI-driven insights |
 
 ---
 
 ## ✨ Features
 
-### 📄 1. Automated Receipt Processing
+### 📄 Automated Receipt Processing
 
-* **Batch Processing:** Upload multiple receipts simultaneously.
-* **Concurrent OCR:** Uses Python's `asyncio` and `ThreadPoolExecutor` to process multiple receipts concurrently.
-* **Smart Extraction:** Extracts important financial information including:
+- **Batch upload:** drop in multiple receipts at once.
+- **Concurrent OCR:** `asyncio` and `ThreadPoolExecutor` process receipts in parallel, so big batches finish faster.
+- **Smart extraction** of the fields that matter:
 
-  * Merchant name
-  * Invoice/receipt date
-  * Base amount
-  * Tax amount
-  * Grand total
-  * Line items
+| Field | Field | Field |
+| :---: | :---: | :---: |
+| 🏪 Merchant | 📅 Date | 💵 Base amount |
+| 🧾 Tax | 💰 Grand total | 🛒 Line items |
 
----
+### 📊 Interactive Financial Analytics
 
-### 📊 2. Interactive Financial Analytics
+Extracted data is normalized with **Pandas** and visualized with **Plotly**, and every chart is interactive (hover, zoom, filter).
 
-The application normalizes extracted financial data using **Pandas** and generates interactive visualizations using **Plotly**.
+| Chart | What it shows |
+| :--- | :--- |
+| 🍩 **Donut** | Expense breakdown by category |
+| 📊 **Bar** | Total spending by top vendors |
+| 📈 **Line** | Spending trends over time |
+| 🥞 **Stacked bar** | Tax vs. base amount by vendor |
+| 🟩 **Treemap** | Total Spend → Category → Vendor |
+| 🥧 **Pie** | OCR-extracted vs. manually entered expenses |
 
-#### Available Visualizations
+### 💬 AI Financial Advisor
 
-* 🍩 **Donut Chart** — Expense breakdown by category.
-* 📊 **Bar Chart** — Total spending by top vendors.
-* 📈 **Line Chart** — Spending trends over time.
-* 🥞 **Stacked Bar Chart** — Tax vs. base amount by vendor.
-* 🟩 **Treemap** — Hierarchical spending breakdown:
-  `Total Spend → Category → Vendor`
-* 🥧 **Pie Chart** — Automated OCR expenses vs. manual entries.
+Ask questions in plain English and get answers based on your real data.
 
----
+- **Context-aware:** the ledger is converted into a lightweight CSV and sent to Gemini as context.
+- **Conversational:** chat directly from the dashboard.
+- **Actionable:** concise insights, not generic advice.
+- **Clean rendering:** responses are formatted as HTML for the dashboard.
 
-### 💬 3. AI Financial Advisor
+### ✍️ Human-in-the-Loop Data Entry
 
-The built-in AI assistant uses **Google Gemini 2.5 Flash** to analyze the user's financial ledger.
+OCR can struggle with blurry, crumpled or incomplete receipts. When it does, you can add an expense manually:
 
-#### Key Capabilities
+`Merchant` · `Date` · `Amount` · `Category` · `Description`
 
-* **Context-Aware Analysis:** Converts the financial ledger into a lightweight CSV representation before sending relevant context to Gemini.
-* **Conversational Interface:** Ask questions about your expenses directly from the dashboard.
-* **Actionable Insights:** Receive concise financial analysis based on your actual ledger.
-* **HTML Responses:** Gemini responses are formatted as HTML for clean rendering inside the dashboard.
+Manual entries are normalized into the same structure as OCR results, so charts and the AI advisor treat them identically.
 
----
+### 🔐 Built-in Authentication
 
-### ✍️ 4. Human-in-the-Loop Data Entry
-
-OCR may occasionally fail on blurry, damaged, or incomplete receipts.
-
-AI CFO provides a **manual expense entry** workflow that allows users to enter:
-
-* Merchant
-* Date
-* Amount
-* Category
-* Description
-
-Manual entries are normalized into the same structure used by automatically extracted expenses.
+Register and log in with **bcrypt**-hashed passwords and **JWT** sessions stored in HTTP-only cookies.
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ How It Works
 
-```text
-┌─────────────────────────────┐
-│          User Interface     │
-│      HTML / Jinja2 / CSS    │
-└──────────────┬──────────────┘
-               │
-        ┌──────┴───────┐
-        │              │
-     Uploads       Chat Queries
-        │              │
-        ▼              ▼
-┌─────────────────────────────────┐
-│          FastAPI Backend        │
-└──────────────┬──────────────────┘
-               │
-       ┌───────┴────────┐
-       │                │
-       ▼                ▼
-┌──────────────┐  ┌────────────────┐
-│  PaddleOCR   │  │ Google Gemini  │
-│ Receipt OCR  │  │  2.5 Flash     │
-└──────┬───────┘  └───────┬────────┘
-       │                  │
-       ▼                  │
-┌─────────────────┐       │
-│ Pandas          │       │
-│ Data Processing │◄──────┘
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│ Plotly Analytics        │
-│ Dashboard               │
-└────────┬────────────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│ data/expenses.json      │
-│ Central Financial Ledger│
-└─────────────────────────┘
+```mermaid
+flowchart LR
+    U["👤 User<br/>HTML / Jinja2 / CSS / JS"] -->|Upload receipts| API
+    U -->|Chat query| API
+    API["⚡ FastAPI Backend"] -->|Images| OCR["🔍 PaddleOCR<br/>Receipt extraction"]
+    OCR --> PD["🐼 Pandas<br/>Clean & normalize"]
+    PD <--> L[("📒 data/expenses.json<br/>Central ledger")]
+    PD --> PL["📊 Plotly<br/>Interactive dashboard"]
+    API -->|Ledger as CSV + question| G["✨ Gemini 2.5 Flash<br/>Financial advisor"]
+    L -.-> G
+    PL --> U
+    G -->|HTML answer| U
 ```
+
+1. **Upload:** receipts go to the FastAPI backend.
+2. **Extract:** PaddleOCR reads each receipt concurrently.
+3. **Normalize:** Pandas converts everything into one consistent ledger.
+4. **Visualize:** Plotly renders the interactive dashboard.
+5. **Ask:** Gemini answers questions using your ledger as context.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Technology                  | Purpose                              |
-| --------------------------- | ------------------------------------ |
-| **Python**                  | Core programming language            |
-| **FastAPI**                 | Backend API and web server           |
-| **PaddleOCR**               | Receipt text extraction              |
-| **Google Gemini 2.5 Flash** | AI financial analysis                |
-| **Pandas**                  | Data processing and normalization    |
-| **Plotly**                  | Interactive financial visualizations |
-| **Jinja2**                  | HTML template rendering              |
-| **SQLAlchemy**              | User authentication database         |
-| **SQLite**                  | User account storage                 |
-| **bcrypt**                  | Password hashing                     |
-| **PyJWT**                   | Authentication tokens                |
-| **HTML/CSS/JavaScript**     | Frontend interface                   |
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Language** | Python | Core programming language |
+| **Backend** | FastAPI | API and web server |
+| **OCR** | PaddleOCR | Receipt text extraction |
+| **AI** | Google Gemini 2.5 Flash | Financial analysis and chat |
+| **Data** | Pandas | Processing and normalization |
+| **Visualization** | Plotly | Interactive charts |
+| **Templating** | Jinja2 | HTML rendering |
+| **Auth & DB** | SQLAlchemy · SQLite | User accounts |
+| **Security** | bcrypt · PyJWT | Password hashing and tokens |
+| **Frontend** | HTML · CSS · JavaScript | User interface |
 
 ---
 
-# 🚀 Installation & Setup
+## 🚀 Quick Start
 
-## 1. Prerequisites
+### Prerequisites
 
-Make sure you have:
+- Python **3.9, 3.10 or 3.11**
+- A **Google Gemini API key** from [Google AI Studio](https://aistudio.google.com/)
+- Git
+- *(Windows)* C++ Build Tools, if your PaddleOCR/PaddlePaddle setup requires them
 
-* Python **3.9, 3.10, or 3.11**
-* Google Gemini API key
-* Git
-* C++ Build Tools on Windows if required by your PaddleOCR/PaddlePaddle setup
-
-You can obtain a Gemini API key from **Google AI Studio**.
-
----
-
-## 2. Clone the Repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/kg0420/AI_CFO.git
-cd AI_CFO
+git clone https://github.com/kg0420/AI-CFO.git
+cd AI-CFO
 ```
 
+### 2. Create a virtual environment
 
----
-
-## 3. Create a Virtual Environment
-
-### Windows
+<details open>
+<summary><b>🪟 Windows</b></summary>
 
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
-### macOS / Linux
+</details>
+
+<details>
+<summary><b>🍎 macOS / 🐧 Linux</b></summary>
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
----
+</details>
 
-## 4. Install Dependencies
-
-Install the core dependencies:
+### 3. Install dependencies
 
 ```bash
 pip install fastapi uvicorn pandas plotly google-genai python-dotenv python-multipart jinja2 sqlalchemy PyJWT bcrypt
 ```
 
-### Install PaddleOCR
-
-PaddleOCR requires PaddlePaddle as its backend.
-
-For a CPU-based setup, install PaddlePaddle according to your operating system and Python version, then install PaddleOCR:
+Then install PaddleOCR (it needs PaddlePaddle as its backend):
 
 ```bash
 python -m pip install paddlepaddle
 pip install "paddleocr>=2.0.1"
 ```
 
-> **Note:** PaddlePaddle installation can vary depending on your operating system, Python version, CPU architecture, and whether you are using CPU or GPU acceleration. Refer to the official PaddleOCR/PaddlePaddle installation instructions if the standard command does not work.
+> 💡 **Tip:** PaddlePaddle installation varies by OS, Python version, CPU architecture and CPU/GPU choice. If the command above fails, follow the official [PaddleOCR installation guide](https://github.com/PaddlePaddle/PaddleOCR).
 
----
-
-## 5. Configure Environment Variables
+### 4. Configure environment variables
 
 Create a `.env` file in the project root:
 
@@ -213,191 +205,170 @@ GEMINI_API_KEY=your_actual_gemini_api_key
 SECRET_KEY=your_long_random_secret_key
 ```
 
-**Do not commit `.env` to GitHub.**
+> ⚠️ **Never commit `.env` to GitHub.** Make sure your `.gitignore` includes:
+>
+> ```text
+> .env
+> venv/
+> .venv/
+> __pycache__/
+> *.pyc
+> temp_uploads/
+> ```
 
-Add the following to `.gitignore`:
-
-```text
-.env
-venv/
-.venv/
-__pycache__/
-*.pyc
-temp_uploads/
-```
-
----
-
-## 6. Run the Application
-
-Start the FastAPI development server:
+### 5. Run the app
 
 ```bash
 uvicorn main:app --reload
 ```
 
-Open your browser and navigate to:
-
-```text
-http://localhost:8000
-```
+Open **http://localhost:8000** and you're in. 🎉
 
 ---
 
-# 🌐 API Endpoints
+## 🌐 API Reference
 
-| Method | Endpoint              | Description                                                        |
-| ------ | --------------------- | ------------------------------------------------------------------ |
-| `GET`  | `/`                   | Renders the main dashboard and expense interface.                  |
-| `GET`  | `/auth`               | Renders the authentication page.                                   |
-| `POST` | `/register`           | Creates a new user account.                                        |
-| `POST` | `/login`              | Authenticates a user and creates a JWT session.                    |
-| `GET`  | `/logout`             | Logs the current user out.                                         |
-| `POST` | `/generate-report`    | Processes uploaded receipts and generates the financial dashboard. |
-| `POST` | `/add-manual-expense` | Adds a manually entered expense.                                   |
-| `POST` | `/api/chat`           | Sends a financial question to the AI CFO assistant.                |
-
----
-
-# 🤖 Example AI CFO Queries
-
-Once your ledger contains financial data, try asking:
-
-```text
-What is my highest spending category this month?
-
-Are there any anomalies or duplicate charges from this vendor?
-
-Summarize my spending trends in 3 bullet points.
-
-Calculate the total amount of tax I paid across all my receipts.
-
-Which vendor do I spend the most money with?
-
-What are my biggest areas of unnecessary spending?
-```
+| Method | Endpoint | Description |
+| :---: | :--- | :--- |
+| `GET` | `/` | Main dashboard and expense interface |
+| `GET` | `/auth` | Authentication page |
+| `POST` | `/register` | Create a new user account |
+| `POST` | `/login` | Authenticate and create a JWT session |
+| `GET` | `/logout` | Log the current user out |
+| `POST` | `/generate-report` | Process uploaded receipts and build the dashboard |
+| `POST` | `/add-manual-expense` | Add a manually entered expense |
+| `POST` | `/api/chat` | Send a question to the AI CFO assistant |
 
 ---
 
-# 📁 Project Structure
+## 💡 Ask the AI CFO
+
+Once your ledger has data, try questions like:
+
+> 💬 *What is my highest spending category this month?*
+>
+> 💬 *Are there any anomalies or duplicate charges from this vendor?*
+>
+> 💬 *Summarize my spending trends in 3 bullet points.*
+>
+> 💬 *Calculate the total amount of tax I paid across all my receipts.*
+>
+> 💬 *Which vendor do I spend the most money with?*
+>
+> 💬 *What are my biggest areas of unnecessary spending?*
+
+---
+
+## 📁 Project Structure
 
 ```text
-AI_CFO/
-│
-├── main.py
-├── ocr_extraction.py
-├── expense_processing.py
-├── report_utils.py
-│
+AI-CFO/
+├── main.py                 # FastAPI app, auth, routes, OCR orchestration, AI chat
+├── ocr_extraction.py       # PaddleOCR setup and receipt extraction
+├── expense_processing.py   # Expense processing and JSON ledger operations
+├── report_utils.py         # Report / dashboard rendering utilities
+├── data_preprocess.py      # Data preprocessing helpers
+├── graph_plotting.py       # Plotly chart generation
+├── plotting.ipynb          # Notebook for chart experiments
+├── test.py                 # Test / scratch script
 ├── requirements.txt
-├── .env
-├── .gitignore
+├── .env                    # 🔒 Not committed
 │
-├── data/
-│   ├── expenses.json
-│   └── users.db
-│
-├── temp_uploads/
-│
-├── static/
-│   ├── css/
-│   └── js/
-│
+├── data/                   # expenses.json (ledger)
+├── database/               # User accounts database
+├── invoices/               # Sample receipts / invoices
+├── temp_uploads/           # Temporary upload storage
 └── templates/
-    ├── auth.html
-    ├── index.html
-    └── report.html
+    ├── auth.html           # Login and registration
+    ├── index.html          # Receipt upload and manual entry
+    └── report.html         # Analytics dashboard and AI assistant
 ```
 
-### Core Files
+<details>
+<summary><b>📌 Core files explained</b></summary>
 
-| File                    | Responsibility                                                                  |
-| ----------------------- | ------------------------------------------------------------------------------- |
-| `main.py`               | FastAPI application, authentication, API routes, OCR orchestration, and AI chat |
-| `ocr_extraction.py`     | PaddleOCR initialization and receipt extraction                                 |
-| `expense_processing.py` | Expense data processing and JSON ledger operations                              |
-| `report_utils.py`       | Report/dashboard rendering utilities                                            |
-| `templates/auth.html`   | Login and registration interface                                                |
-| `templates/index.html`  | Receipt upload and manual expense interface                                     |
-| `templates/report.html` | Financial analytics dashboard and AI assistant                                  |
-| `data/expenses.json`    | Central expense ledger                                                          |
-| `data/users.db`         | SQLite database containing user accounts                                        |
+| File | Responsibility |
+| :--- | :--- |
+| `main.py` | FastAPI application, authentication, API routes, OCR orchestration and AI chat |
+| `ocr_extraction.py` | PaddleOCR initialization and receipt extraction |
+| `expense_processing.py` | Expense data processing and JSON ledger operations |
+| `report_utils.py` | Report and dashboard rendering utilities |
+| `templates/auth.html` | Login and registration interface |
+| `templates/index.html` | Receipt upload and manual expense interface |
+| `templates/report.html` | Financial analytics dashboard and AI assistant |
+| `data/expenses.json` | Central expense ledger |
+
+</details>
 
 ---
 
-# 🔐 Authentication & Security
+## 🔐 Authentication & Security
 
-AI CFO includes a basic authentication system using:
+| Feature | Implementation |
+| :--- | :--- |
+| Password storage | **bcrypt** hashing |
+| Sessions | **JWT** tokens |
+| Token storage | **HTTP-only cookies** |
+| User accounts | **SQLite + SQLAlchemy** |
+| Secrets | Environment variables (`.env`) |
 
-* **bcrypt** for password hashing.
-* **JWT** for session authentication.
-* **HTTP-only cookies** for storing authentication tokens.
-* **SQLite + SQLAlchemy** for user account management.
-* Environment variables for sensitive API keys and secrets.
-
-> For production deployments, use a strong `SECRET_KEY` and a persistent production database such as PostgreSQL instead of relying on local SQLite storage.
+> 🛡️ **For production:** use a strong `SECRET_KEY` and a persistent managed database such as PostgreSQL instead of local SQLite.
 
 ---
 
-# ☁️ Deployment on Render
+## ☁️ Deployment on Render
 
-AI CFO can be deployed as a **FastAPI Web Service** on Render.
+Deploy AI CFO as a **FastAPI Web Service** on [Render](https://render.com/):
 
-### Build Command
+| Setting | Value |
+| :--- | :--- |
+| **Build command** | `pip install -r requirements.txt` |
+| **Start command** | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
 
-```bash
-pip install -r requirements.txt
-```
-
-### Start Command
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port $PORT
-```
-
-### Required Environment Variables
-
-Add these variables in the Render dashboard:
+Add these environment variables in the Render dashboard:
 
 ```text
 GEMINI_API_KEY=your_gemini_api_key
 SECRET_KEY=your_production_secret_key
 ```
 
-> **Important:** Local files such as `users.db` and `expenses.json` should not be treated as permanent storage on an ephemeral deployment environment. For a production deployment, migrate persistent application data to a managed database.
+> ⚠️ **Heads-up:** `users.db` and `expenses.json` are local files and won't persist on Render's ephemeral filesystem. For a production deployment, migrate persistent data to a managed database.
 
 ---
 
-# 🔮 Roadmap
+## 🔮 Roadmap
 
-* [ ] **Database Migration** — Move the expense ledger from JSON to SQLite/PostgreSQL for better concurrency and CRUD operations.
-* [ ] **Data Export** — Add one-click CSV and PDF exports for financial/tax reporting.
-* [ ] **Budget Alerts** — Allow users to define category budgets and receive burn-rate warnings.
-* [ ] **Receipt Compression** — Downscale receipt images before OCR to improve processing speed.
-* [ ] **Advanced Financial Insights** — Add forecasting and spending trend prediction.
-* [ ] **Multi-User Data Isolation** — Fully isolate financial data between authenticated users.
-
----
-
-# 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome.
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Make your changes.
-4. Commit your changes.
-5. Push the branch.
-6. Open a Pull Request.
+- [ ] 🗄️ **Database migration:** move the ledger from JSON to SQLite/PostgreSQL for better concurrency and CRUD
+- [ ] 📤 **Data export:** one-click CSV and PDF exports for financial and tax reporting
+- [ ] 🔔 **Budget alerts:** category budgets with burn-rate warnings
+- [ ] 🗜️ **Receipt compression:** downscale images before OCR for faster processing
+- [ ] 🔮 **Advanced insights:** forecasting and spending trend prediction
+- [ ] 👥 **Multi-user data isolation:** fully separate financial data between authenticated users
 
 ---
 
-# 📄 License
+## 🤝 Contributing
 
-This project is licensed under the **MIT License**.
+Contributions, issues and feature requests are welcome!
+
+1. 🍴 **Fork** the repository
+2. 🌿 Create a feature branch: `git checkout -b feature/amazing-feature`
+3. 💾 Commit your changes: `git commit -m "Add amazing feature"`
+4. 📤 Push the branch: `git push origin feature/amazing-feature`
+5. 🔁 Open a **Pull Request**
 
 ---
 
-## ⭐ Support
+## 📄 License
 
-If you find AI CFO useful, consider giving the repository a ⭐ on GitHub.
+Distributed under the **MIT License**.
+
+---
+
+<div align="center">
+
+### ⭐ If AI CFO helped you, consider giving it a star!
+
+Built with ❤️ by [Krish Gupta](https://github.com/kg0420)
+
+</div>

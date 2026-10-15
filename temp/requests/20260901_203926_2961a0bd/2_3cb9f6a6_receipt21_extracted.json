@@ -1,0 +1,87 @@
+{
+    "document_metadata": {
+        "document_type": "Payment Confirmation",
+        "invoice_number": null,
+        "order_number": "pvrcinemas-462260149344158-1",
+        "tracking_or_packet_id": null,
+        "invoice_date": "2026-08-09",
+        "due_date": null,
+        "billing_period_start": null,
+        "billing_period_end": null,
+        "place_of_supply": null,
+        "nature_of_transaction": null,
+        "expense_category": null,
+        "currency_code": "INR"
+    },
+    "seller_details": {
+        "vendor_name": "PVR INOX",
+        "platform_or_marketplace": "Amazon Pay",
+        "billing_address": null,
+        "shipping_address": null,
+        "tax_id_gstin": null,
+        "pan_or_company_id": null,
+        "contact_phone": null,
+        "contact_email": null
+    },
+    "buyer_details": {
+        "customer_name": "Tanmay",
+        "customer_company": null,
+        "customer_type": null,
+        "billing_address": null,
+        "shipping_address": null,
+        "tax_id_gstin": null
+    },
+    "financial_totals": {
+        "gross_amount_pre_discount": null,
+        "total_discount_amount": null,
+        "taxable_amount_subtotal": null,
+        "total_tax_amount": null,
+        "shipping_and_handling_charges": null,
+        "other_charges": null,
+        "grand_total": 1509.3,
+        "amount_paid": 1509.3,
+        "balance_due": 0.0
+    },
+    "tax_breakdown": {
+        "cgst_amount": null,
+        "sgst_amount": null,
+        "igst_amount": null,
+        "vat_amount": null,
+        "sales_tax_amount": null,
+        "tax_cess_amount": null
+    },
+    "payment_details": {
+        "payment_method": "Amazon Pay",
+        "payment_transaction_id": "P04-2705369-7205795",
+        "payment_date": "2026-08-09"
+    },
+    "line_items": [
+        {
+            "item_id_or_sku": null,
+            "description": "Payment to PVR INOX",
+            "hsn_sac_code": null,
+            "quantity": 1.0,
+            "unit_price": 1509.3,
+            "discount_amount": null,
+            "taxable_value": null,
+            "tax_percentage": null,
+            "tax_amount": null,
+            "total_item_amount": 1509.3
+        }
+    ],
+    "source_file": "2_3cb9f6a6_receipt21.png",
+    "raw_ocr_text_reference": "M\nYour payment of ₹ 1509.3 to PVR INoX was successful\n1 message\nAmazon Pay India <no-reply@amazonpay.in>\nSun, 9 Aug, 2026 at 12:10 pm\nTo: tanmaykotak22@gmail.com\namazon pay\nHiTanmay,\nYour payment to PVR INoX was Approved\nPaid to\nAmount\nPVRINOX\n1509.3\nSeller\nPVRINOX\nPVR INOX Id pvrcinemas-462260149344158-1\nTransaction IDP04-2705369-7205795\nPayment date Sunday, 09 August, 2026 12:09:53 PM IST\nView all transactio ns\nContact Information\nTo report any unauthorized transaction, please\ndick here\nGet Questions?\nContact PVR INOX\nContact Amazon Pay\n😜\nTrusted & secure payments\nTerms & Conditions\nThis email was sent from an emal address that can't receive\nemails. Pl ease don't reply to this emal.",
+    "validation": {
+        "status": "VALID",
+        "line_items_count": 1,
+        "valid_line_items": 1,
+        "line_items_total": 1509.3,
+        "grand_total": 1509.3,
+        "line_items_difference": 0.0,
+        "accounting_total": null,
+        "accounting_difference": null,
+        "tax_breakdown_total": 0.0,
+        "tax_difference": null
+    },
+    "document_hash": "e5640ba6d977a0a12283402db4b624ade93908890e7fce5a2caacd62df751981"
+}

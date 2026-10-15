@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
-
+import uuid
 # ============================================================
 # STORAGE CONFIGURATION
 # ============================================================
@@ -48,10 +48,68 @@ def load_all_expenses(username: str) -> list:
         with open(expense_path, "r", encoding="utf-8") as file:
             data = json.load(file)
             if isinstance(data, list):
+                modified=False
+                for item in data:
+                    if not item.get("id"):
+                        item["id"]=uuid.uuid4().hex[:12]
+                        modified=True
+                if modified:
+                    with open(expense_path,"w",encoding="utf-8") as wf:
+                        json.dump(data,wf,indent=4,ensure_ascii=False)
+
                 return data
             return []
     except (json.JSONDecodeError, OSError):
         return []
+
+def update_user_expense(username: str, expense_id: str, updates: dict) -> bool:
+    """Update merchant, date, category, or amount for a specific expense."""
+    expenses = load_all_expenses(username)
+    target = None
+
+    for exp in expenses:
+        if exp.get("id") == expense_id:
+            target = exp
+            break
+
+    if not target:
+        return False
+
+    # Apply updates
+    if "merchant" in updates:
+        target.setdefault("merchant_info", {})["name"] = updates["merchant"]
+        target.setdefault("seller_details", {})["vendor_name"] = updates["merchant"]
+    if "date" in updates:
+        target.setdefault("merchant_info", {})["date"] = updates["date"]
+        target.setdefault("document_metadata", {})["invoice_date"] = updates["date"]
+    if "category" in updates:
+        target["category"] = updates["category"]
+        target.setdefault("document_metadata", {})["expense_category"] = updates["category"]
+    if "amount" in updates:
+        try:
+            amt = float(updates["amount"])
+            target.setdefault("financial_totals", {})["grand_total"] = amt
+        except (ValueError, TypeError):
+            pass
+
+    expense_path = get_user_expense_path(username)
+    with open(expense_path, "w", encoding="utf-8") as f:
+        json.dump(expenses, f, indent=4, ensure_ascii=False)
+    return True
+
+def delete_user_expense(username: str, expense_id: str) -> bool:
+    """Remove a specific expense from the user's ledger."""
+    expenses = load_all_expenses(username)
+    initial_len = len(expenses)
+    filtered = [e for e in expenses if e.get("id") != expense_id]
+
+    if len(filtered) == initial_len:
+        return False
+
+    expense_path = get_user_expense_path(username)
+    with open(expense_path, "w", encoding="utf-8") as f:
+        json.dump(filtered, f, indent=4, ensure_ascii=False)
+    return True
 
 # ============================================================
 # SAVE USER EXPENSES
@@ -73,13 +131,15 @@ def save_expenses(new_expenses: list) -> None:
     for username, user_expenses in expenses_by_user.items():
         existing_expenses = load_all_expenses(username)
 
-        # de-dupe by (request_id, source_file) so re-runs don't pile up
+        # de-dupe by unique id or (request_id, source_file)
         seen = {
-            (e.get("request_id"), e.get("source_file"))
+            e.get("id") or (e.get("request_id"), e.get("source_file"))
             for e in existing_expenses
         }
         for expense in user_expenses:
-            key = (expense.get("request_id"), expense.get("source_file"))
+            if not expense.get("id"):
+                expense["id"] = uuid.uuid4().hex[:12]
+            key = expense.get("id") or (expense.get("request_id"), expense.get("source_file"))
             if key in seen:
                 continue
             existing_expenses.append(expense)
@@ -103,15 +163,30 @@ def format_manual_entry(
 ) -> dict:
     """Standardize manual input to match the AI OCR output structure."""
     desc = description if description else f"{category} Expense"
+    entry_date = date or datetime.today().strftime("%Y-%m-%d")
 
     return {
+        "id": uuid.uuid4().hex[:12],
         "data_source": "manual_entry",
+        "document_metadata": {
+            "document_type": "manual_entry",
+            "invoice_number": None,
+            "invoice_date": entry_date,
+            "expense_category": category,
+            "currency_code": "INR",
+        },
+        "seller_details": {
+            "vendor_name": merchant,
+            "platform_or_marketplace": merchant,
+        },
         "merchant_info": {
             "name": merchant,
-            "date": date or datetime.today().strftime("%Y-%m-%d"),
+            "date": entry_date,
         },
         "financial_totals": {
             "grand_total": total,
+            "taxable_amount_subtotal": total,
+            "total_tax_amount": 0.0,
             "tax": 0.0,
         },
         "category": category,
@@ -122,6 +197,7 @@ def format_manual_entry(
                 "item_description": desc,
                 "price": total,
                 "quantity": 1,
+                "total_item_amount": total,
             }
         ],
     }
@@ -132,6 +208,8 @@ def format_manual_entry(
 __all__ = [
     "load_all_expenses",
     "save_expenses",
+    "update_user_expense",
+    "delete_user_expense",
     "format_manual_entry",
     "sanitize_username",
     "get_user_directory",

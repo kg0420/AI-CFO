@@ -1,0 +1,87 @@
+{
+    "document_metadata": {
+        "billing_period_start": null,
+        "billing_period_end": null,
+        "currency_code": "INR",
+        "document_type": "Fees Receipt",
+        "due_date": null,
+        "expense_category": "Education",
+        "invoice_date": "2024-07-08",
+        "invoice_number": "00753410",
+        "nature_of_transaction": null,
+        "order_number": null,
+        "place_of_supply": null,
+        "tracking_or_packet_id": null
+    },
+    "seller_details": {
+        "billing_address": null,
+        "contact_email": null,
+        "contact_phone": null,
+        "pan_or_company_id": null,
+        "platform_or_marketplace": null,
+        "shipping_address": null,
+        "tax_id_gstin": null,
+        "vendor_name": "B. V. COLLEGE OF ENGINEERING, LAVALE"
+    },
+    "buyer_details": {
+        "billing_address": null,
+        "customer_company": "B. V. COLLEGE OF ENGINEERING, LAVALE",
+        "customer_name": "Krish Anilkumar Gupta",
+        "customer_type": null,
+        "shipping_address": null,
+        "tax_id_gstin": null
+    },
+    "financial_totals": {
+        "amount_paid": 11614.0,
+        "balance_due": null,
+        "grand_total": 11614.0,
+        "gross_amount_pre_discount": 11614.0,
+        "other_charges": null,
+        "shipping_and_handling_charges": null,
+        "taxable_amount_subtotal": 11614.0,
+        "total_discount_amount": null,
+        "total_tax_amount": null
+    },
+    "tax_breakdown": {
+        "cgst_amount": null,
+        "igst_amount": null,
+        "sales_tax_amount": null,
+        "sgst_amount": null,
+        "tax_cess_amount": null,
+        "vat_amount": null
+    },
+    "payment_details": {
+        "payment_date": "2024-07-08",
+        "payment_method": "upi",
+        "payment_transaction_id": "419035322808"
+    },
+    "line_items": [
+        {
+            "description": "Tuition Fees / 0th 2nd Year",
+            "discount_amount": null,
+            "hsn_sac_code": null,
+            "item_id_or_sku": null,
+            "quantity": 1,
+            "tax_amount": null,
+            "tax_percentage": null,
+            "taxable_value": 11614.0,
+            "total_item_amount": 11614.0,
+            "unit_price": 11614.0
+        }
+    ],
+    "source_file": "4_515fffa7_receipt17.jpg",
+    "raw_ocr_text_reference": "x\nFees Receipt\nKrish Anilkumar Gupta\nPRN No. :\nCollege: B. V. COLLEGE OF ENGINEERING, LAVALE\nFaculty: Computer Engineering\nRECEIPT NO :\n00753410\nRECEIPT DATE :\n08/07/2024\nPAYMENT ID :\n113365643100\nTRANSACTION ID :\n419035322808\nPAYMENT MODE :\nupi\nDESCRIPTION\nSEMESTER\nYEAR\nAMOUNT\nTuition Fees /\n0th\n2nd Year\n11614.00\nDevelopment\nFees /\nUniversity\nMisc.\nTerms & Conditions\nThank you for your payment. College fees policies applicable.\nThis is computer generated receipt, so does not require\nsignature.\nThank you",
+    "validation": {
+        "status": "VALID",
+        "line_items_count": 1,
+        "valid_line_items": 1,
+        "line_items_total": 11614.0,
+        "grand_total": 11614.0,
+        "line_items_difference": 0.0,
+        "accounting_total": 11614.0,
+        "accounting_difference": 0.0,
+        "tax_breakdown_total": 0.0,
+        "tax_difference": null
+    },
+    "document_hash": "9ae79a889e08e546578d23171305bb5aca461ebe6341c45d916acee309ce48a1"
+}

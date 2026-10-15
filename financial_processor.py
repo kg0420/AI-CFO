@@ -1,3 +1,9 @@
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 import hashlib
 import json
 import os
@@ -32,7 +38,7 @@ if not GROQ_API_KEY and not GEMINI_API_KEY:
 groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 gemini_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 GROQ_MAX_RETRIES = int(os.getenv("GROQ_MAX_RETRIES", "2"))
 GEMINI_MAX_RETRIES = int(os.getenv("GEMINI_MAX_RETRIES", "2"))
 
@@ -218,9 +224,6 @@ def _execute_gemini_json_call(system_prompt, user_prompt, schema_name):
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=_gemini_compatible_schema(FINANCIAL_JSON_SCHEMA),
-                    thinking_config=types.ThinkingConfig(
-                        thinking_level="low"
-                    ),
                 ),
             )
 
@@ -357,8 +360,10 @@ def validate_financial_data(data):
     tax_diff = round(total_tax - tax_breakdown_total, 2) if total_tax is not None else None
 
     checks = []
-    if grand_total is not None:
-        checks.append(abs(line_diff or 0) <= 0.05)
+    if grand_total is not None and len(valid_lines) > 0:
+        matches_grand = abs(line_diff or 0) <= 0.05
+        matches_subtotal = abs(round((subtotal or 0.0) - line_items_total, 2)) <= 0.05 if subtotal is not None else False
+        checks.append(matches_grand or matches_subtotal)
     if acc_diff is not None:
         checks.append(abs(acc_diff) <= 0.05)
     if total_tax is not None and any(tax_values):

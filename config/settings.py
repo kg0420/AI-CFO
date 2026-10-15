@@ -35,11 +35,7 @@ LOG_PATH = DATABASE_DIR / "ai_cfo_logs.txt"
 # ============================================================
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-
-if not GROQ_API_KEY:
-    raise ValueError("❌ GROQ_API_KEY is not set.")
-
-GROQ_MODEL = "openai/gpt-oss-20b"
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 
 
 # ============================================================

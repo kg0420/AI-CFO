@@ -99,7 +99,7 @@ def save_request_status(request_dir, status, message=None):
 # ============================================================
 # MAIN BATCH PROCESSOR
 # ============================================================
-def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT):
+def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT, progress_callback=None):
     """
     Process multiple financial documents.
     Pipeline: Image -> Optimize -> PaddleOCR -> Temp OCR text -> Multi-LLM -> Validation -> Correction -> DB
@@ -118,6 +118,14 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT):
     print("=" * 70)
 
     save_request_status(request_dir, "STARTED")
+
+    if progress_callback:
+        progress_callback({
+            "step": "prep",
+            "message": f"Pre-processing and optimizing {len(image_paths)} receipt images...",
+            "total": len(image_paths),
+            "percent": 10
+        })
 
     # ========================================================
     # STEP 1 — IMAGE PREPARATION
@@ -154,6 +162,14 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT):
     ocr_start = time.perf_counter()
     print("\n🔎 Running PaddleOCR batch inference...")
 
+    if progress_callback:
+        progress_callback({
+            "step": "ocr_batch",
+            "message": f"Running PaddleOCR engine across {len(images)} documents...",
+            "total": len(images),
+            "percent": 25,
+        })
+
     try:
         ocr_results = list(ocr.predict(images))
     except Exception as exc:
@@ -188,6 +204,17 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT):
             print(f"📝 {filename}: {len(receipt_text)} characters")
             print(f"🔍 [{request_id}] OCR lines: {len(receipt_text.splitlines())}")
 
+            if progress_callback:
+                progress_callback({
+                    "step": "ocr_item",
+                    "filename": filename,
+                    "lines": len(receipt_text.splitlines()),
+                    "index": idx + 1,
+                    "total": len(valid_paths),
+                    "message": f"Scanned text from {filename} ({len(receipt_text.splitlines())} lines)",
+                    "percent": 25 + int(((idx + 1) / len(valid_paths)) * 25),
+                })
+
         except Exception as exc:
             print(f"❌ Text extraction failed for {filename}: {exc}")
 
@@ -204,6 +231,14 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT):
     print("   🔀 Routing receipts between Gemini and Groq")
     print("   🛡️ Automatic fallback enabled if one provider fails")
 
+    if progress_callback:
+        progress_callback({
+            "step": "llm_batch",
+            "message": f"Running parallel AI extraction on {len(image_texts)} documents...",
+            "total": len(image_texts),
+            "percent": 55,
+        })
+
     final_results = []
     max_workers = min(MAX_GROQ_WORKERS, len(image_texts))
 
@@ -211,8 +246,6 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT):
         future_map = {}
 
         for index, (filename, receipt_text, file_hash) in enumerate(image_texts):
-            # Deterministic round-robin:
-            # receipt 1 -> Gemini, receipt 2 -> Groq, receipt 3 -> Gemini, ...
             preferred_provider = "gemini" if index % 2 == 0 else "groq"
 
             future = executor.submit(
@@ -256,7 +289,6 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT):
                 validation_status = result.get("validation", {}).get("status")
 
                 if validation_status == "REVIEW_REQUIRED":
-                    # Prefer the opposite provider for correction to spread load.
                     correction_provider = (
                         "groq" if preferred_provider == "gemini" else "gemini"
                     )
@@ -279,6 +311,35 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT):
                         save_temp_extraction(request_dir, filename, result)
 
                 final_results.append(result)
+
+                seller = result.get("seller_details", {})
+                merchant_name = (
+                    result.get("merchant_info", {}).get("name")
+                    or seller.get("vendor_name")
+                    or seller.get("platform_or_marketplace")
+                    or "Unknown Merchant"
+                )
+                totals = result.get("financial_totals", {})
+                grand_total = totals.get("grand_total") or 0.0
+                category = (
+                    result.get("category")
+                    or result.get("document_metadata", {}).get("expense_category")
+                    or "General"
+                )
+
+                if progress_callback:
+                    progress_callback({
+                        "step": "llm_item",
+                        "filename": filename,
+                        "merchant": merchant_name,
+                        "amount": grand_total,
+                        "category": category,
+                        "status": result.get("validation", {}).get("status", "VALID"),
+                        "index": len(final_results),
+                        "total": len(image_texts),
+                        "message": f"Extracted: {merchant_name} · ₹{grand_total:,.2f}",
+                        "percent": 55 + int((len(final_results) / len(image_texts)) * 40),
+                    })
 
             except Exception as exc:
                 print(

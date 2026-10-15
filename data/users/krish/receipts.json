@@ -1,42 +1,28 @@
 [
   {
-    "receipt_id": "eaa9a20e5f8341d4",
+    "receipt_id": "bc995dcdf6b44586",
     "original_filename": "receipt22.png",
-    "stored_filename": "eaa9a20e5f8341d4.png",
-    "relative_path": "receipts/eaa9a20e5f8341d4.png",
+    "stored_filename": "bc995dcdf6b44586.png",
+    "relative_path": "receipts/bc995dcdf6b44586.png",
     "sha256": "9b0d639910a84741dfae46c3c6067ec7cecf72746d005c65fc13b49103a5c14d",
     "mime_type": "image/png",
     "size_bytes": 68750,
-    "uploaded_at": "2026-09-12T03:51:09.977421+00:00",
-    "request_id": "297551be66e7",
-    "user_id": "krish",
-    "last_request_id": "33fe4ba66fb7"
+    "uploaded_at": "2026-10-14T19:40:56.865550+00:00",
+    "request_id": "11725214f0cf",
+    "user_id": "krish"
   },
   {
-    "receipt_id": "05aec2696a984e9d",
-    "original_filename": "receipt19 - Copy.jpg",
-    "stored_filename": "05aec2696a984e9d.jpg",
-    "relative_path": "receipts/05aec2696a984e9d.jpg",
-    "sha256": "cbb4b982226db943699a75142d1c8e718deb2973b268dd3f2136d4e180160021",
-    "mime_type": "image/jpeg",
-    "size_bytes": 519979,
-    "uploaded_at": "2026-09-11T05:36:17.039470+00:00",
-    "request_id": "e4e7a219cd92",
-    "user_id": "krish",
-    "last_request_id": "d980a4192f80"
-  },
-  {
-    "receipt_id": "13a6c83061e4467e",
+    "receipt_id": "f9ea4d5c8f3c4917",
     "original_filename": "receipt20.jpg",
-    "stored_filename": "13a6c83061e4467e.jpg",
-    "relative_path": "receipts/13a6c83061e4467e.jpg",
+    "stored_filename": "f9ea4d5c8f3c4917.jpg",
+    "relative_path": "receipts/f9ea4d5c8f3c4917.jpg",
     "sha256": "b9367464dfa0f96ab34718dba765ffe7c4cc5b974fa57362effb88f55d1ad933",
     "mime_type": "image/jpeg",
     "size_bytes": 762402,
-    "uploaded_at": "2026-09-10T15:37:08.084351+00:00",
-    "request_id": "f98767de1f90",
+    "uploaded_at": "2026-10-08T16:53:15.685553+00:00",
+    "request_id": "900a42f05799",
     "user_id": "krish",
-    "last_request_id": "d980a4192f80"
+    "last_request_id": "13e151f1fc2b"
   },
   {
     "receipt_id": "b17674416f954b55",
@@ -49,7 +35,7 @@
     "uploaded_at": "2026-09-02T16:00:15.320850+00:00",
     "request_id": "668dbe0c8c25",
     "user_id": "krish",
-    "last_request_id": "aa6d26f3ea22"
+    "last_request_id": "11725214f0cf"
   },
   {
     "receipt_id": "7c76a631f3a54f78",
@@ -62,7 +48,7 @@
     "uploaded_at": "2026-09-02T15:33:27.572850+00:00",
     "request_id": "4fff0e62d708",
     "user_id": "krish",
-    "last_request_id": "d29066cd497f"
+    "last_request_id": "11725214f0cf"
   },
   {
     "receipt_id": "3b7b4c36c2ac43da",
@@ -86,8 +72,7 @@
     "size_bytes": 361605,
     "uploaded_at": "2026-09-01T17:51:36.502642+00:00",
     "request_id": "8d03983ad6ae",
-    "user_id": "krish",
-    "last_request_id": "33fe4ba66fb7"
+    "user_id": "krish"
   },
   {
     "receipt_id": "af32354ebfe04b2c",
@@ -100,7 +85,7 @@
     "uploaded_at": "2026-09-01T17:21:48.485308+00:00",
     "request_id": "98b191a880eb",
     "user_id": "krish",
-    "last_request_id": "d29066cd497f"
+    "last_request_id": "11725214f0cf"
   },
   {
     "receipt_id": "6753f118ba7b484e",
@@ -113,7 +98,7 @@
     "uploaded_at": "2026-09-01T17:21:48.443842+00:00",
     "request_id": "98b191a880eb",
     "user_id": "krish",
-    "last_request_id": "dce018fcda84"
+    "last_request_id": "13e151f1fc2b"
   },
   {
     "receipt_id": "9a8c4f6b93f94edd",
@@ -126,7 +111,7 @@
     "uploaded_at": "2026-09-01T17:21:48.388445+00:00",
     "request_id": "98b191a880eb",
     "user_id": "krish",
-    "last_request_id": "d29066cd497f"
+    "last_request_id": "8b39400c2628"
   },
   {
     "receipt_id": "6de1f6b2dd1e47c3",
@@ -139,7 +124,7 @@
     "uploaded_at": "2026-09-01T17:21:48.340400+00:00",
     "request_id": "98b191a880eb",
     "user_id": "krish",
-    "last_request_id": "d29066cd497f"
+    "last_request_id": "11725214f0cf"
   },
   {
     "receipt_id": "9e614d1d28c34de8",
@@ -152,6 +137,6 @@
     "uploaded_at": "2026-09-01T17:21:48.296450+00:00",
     "request_id": "98b191a880eb",
     "user_id": "krish",
-    "last_request_id": "d980a4192f80"
+    "last_request_id": "11725214f0cf"
   }
 ]

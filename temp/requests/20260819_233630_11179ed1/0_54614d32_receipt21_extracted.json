@@ -1,0 +1,74 @@
+{
+    "document_metadata": {
+        "billing_period_end": null,
+        "billing_period_start": null,
+        "currency_code": "INR",
+        "document_type": null,
+        "due_date": null,
+        "expense_category": null,
+        "invoice_date": "2026-08-09",
+        "invoice_number": null,
+        "nature_of_transaction": null,
+        "order_number": null,
+        "place_of_supply": null,
+        "tracking_or_packet_id": null
+    },
+    "seller_details": {
+        "billing_address": null,
+        "contact_email": null,
+        "contact_phone": null,
+        "pan_or_company_id": null,
+        "platform_or_marketplace": "Amazon Pay",
+        "shipping_address": null,
+        "tax_id_gstin": null,
+        "vendor_name": "PVR INOX"
+    },
+    "buyer_details": {
+        "billing_address": null,
+        "customer_company": null,
+        "customer_name": "tanmaykotak22@gmail.com",
+        "customer_type": null,
+        "shipping_address": null,
+        "tax_id_gstin": null
+    },
+    "financial_totals": {
+        "amount_paid": 1509.3,
+        "balance_due": null,
+        "grand_total": 1509.3,
+        "gross_amount_pre_discount": 1509.3,
+        "other_charges": null,
+        "shipping_and_handling_charges": null,
+        "taxable_amount_subtotal": 1509.3,
+        "total_discount_amount": null,
+        "total_tax_amount": null
+    },
+    "tax_breakdown": {
+        "cgst_amount": null,
+        "sgst_amount": null,
+        "igst_amount": null,
+        "vat_amount": null,
+        "sales_tax_amount": null,
+        "tax_cess_amount": null
+    },
+    "payment_details": {
+        "payment_date": "2026-08-09",
+        "payment_method": "Amazon Pay",
+        "payment_transaction_id": "P04-2705369-7205795"
+    },
+    "line_items": [],
+    "source_file": "0_54614d32_receipt21.png",
+    "raw_ocr_text_reference": "Rs 0.00\n1 message\nMyntra\nSun, 9 Aug, 2026 at 12:10 pm\nTo: tanmaykotak22@gmail.com\namazon pay\nHiTanmay,\nYour payment to PVR INOX was Approved\nPaid to\nAmount\nPVRINOX\n1509.3\nSeller\nPVRINOX\nPVR INOX Id\npvrcinemas-462260149344158-1\nTransaction IDP04-2705369-7205795\nCharges\nView all transactions\nContact Information\nUGST\ndlick here\nGet Questions?\nContact PVR INOX\nContact Amazon Pay\nTrusted & secure payments\nTerms & Conditions\nSGST/\nemails. Please don't reply to this email.",
+    "validation": {
+        "status": "REVIEW_REQUIRED",
+        "line_items_count": 0,
+        "valid_line_items": 0,
+        "line_items_total": 0.0,
+        "grand_total": 1509.3,
+        "line_items_difference": 1509.3,
+        "accounting_total": 1509.3,
+        "accounting_difference": 0.0,
+        "tax_breakdown_total": 0.0,
+        "tax_difference": null
+    },
+    "document_hash": "e5640ba6d977a0a12283402db4b624ade93908890e7fce5a2caacd62df751981"
+}

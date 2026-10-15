@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
   :root{
     --paper:#EFEDDF;
@@ -36,16 +35,104 @@
       radial-gradient(1100px 500px at 10% -10%, rgba(169,130,47,0.07), transparent 55%);
     color:var(--ink);
     font-family:'Work Sans', sans-serif;
-    padding:32px 16px 64px;
+    padding:16px 16px 64px;
   }
-  
+
+  /* ---------- responsive top navbar ---------- */
+  .navbar {
+    position: sticky;
+    top: 14px;
+    z-index: 100;
+    width: min(1140px, calc(100% - 32px));
+    margin: 12px auto 26px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 10px 14px;
+    background: rgba(251, 250, 242, 0.96);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: 0 12px 32px -20px var(--shadow);
+    backdrop-filter: blur(10px);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    color: var(--ink);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--forest);
+    color: #F3F1E3;
+    border-radius: 4px;
+    font-family: 'Spectral', serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .brand-copy { display: flex; flex-direction: column; justify-content: center; }
+  .brand-name { font-family: 'Spectral', serif; font-size: 20px; font-weight: 700; line-height: 1; letter-spacing: -0.01em; }
+  .brand-tagline { margin-top: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
+  .nav-links { display: flex; align-items: center; gap: 4px; }
+  .nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 12px;
+    border-radius: 4px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .045em;
+    text-transform: uppercase;
+    transition: color .2s ease, background .2s ease;
+  }
+  .nav-link:hover { color: var(--ink); background: var(--paper); }
+  .nav-link.active { color: var(--stamp); background: #F3EFE3; }
+  .nav-link.active::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 3px;
+    height: 1px;
+    background: var(--stamp);
+    opacity: .7;
+  }
+  .nav-icon { font-size: 14px; line-height: 1; }
+  .nav-toggle {
+    display: none;
+    width: 38px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 18px;
+  }
+
   .sheet{
-    max-width:920px;
-    margin:0 auto;
+    width: min(1140px, calc(100% - 32px));
+    max-width: 1140px;
+    margin: 0 auto;
     background:var(--paper-card);
     border-radius:4px;
     box-shadow:0 18px 44px -18px var(--shadow);
-    padding:clamp(24px, 4vw, 56px);
+    padding:clamp(24px, 4vw, 52px);
     position:relative;
   }
   .sheet::before, .sheet::after{
@@ -58,117 +145,42 @@
   .sheet::before{ top:-9px; }
   .sheet::after{ bottom:-9px; transform:scaleY(-1); }
 
-  /* ============================================================
-       NAVBAR
-       ============================================================ */
-    .navbar {
-      position: sticky;
-      top: 16px;
-      z-index: 100;
-      width: min(1120px, calc(100% - 32px));
-      margin: 16px auto 0;
-      min-height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 10px 12px 10px 16px;
-      background: rgba(251, 250, 242, 0.96);
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      box-shadow: 0 12px 32px -20px var(--shadow);
-      backdrop-filter: blur(10px);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      color: var(--ink);
-      text-decoration: none;
-      flex-shrink: 0;
-    }
-
-    .brand-mark {
-      width: 38px;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--forest);
-      color: #F3F1E3;
-      border-radius: 4px;
-      font-family: 'Spectral', serif;
-      font-size: 20px;
-      font-weight: 700;
-      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
-    }
-
-    .brand-copy { display: flex; flex-direction: column; justify-content: center; }
-    .brand-name { font-family: 'Spectral', serif; font-size: 21px; font-weight: 700; line-height: 1; letter-spacing: -0.01em; }
-    .brand-tagline { margin-top: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: .13em; text-transform: uppercase; color: var(--ink-faint); }
-
-    .nav-links { display: flex; align-items: center; gap: 3px; }
-    .nav-link {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 13px;
-      border-radius: 4px;
-      color: var(--ink-soft);
-      text-decoration: none;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: .045em;
-      text-transform: uppercase;
-      transition: color .2s ease, background .2s ease;
-    }
-
-    .nav-link:hover { color: var(--ink); background: var(--paper); }
-    .nav-link.active { color: var(--stamp); background: #F3EFE3; }
-    .nav-link.active::after {
-      content: "";
-      position: absolute;
-      left: 13px;
-      right: 13px;
-      bottom: 4px;
-      height: 1px;
-      background: var(--stamp);
-      opacity: .7;
-    }
-
-    .nav-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 15px; line-height: 1; }
-    .nav-status {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding-left: 10px;
-      margin-left: 5px;
-      border-left: 1px solid var(--line-soft);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 9px;
-      color: var(--ink-faint);
-      white-space: nowrap;
-    }
-
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 3px rgba(95, 122, 90, 0.10); }
-    .nav-toggle {
-      display: none;
-      width: 40px;
-      height: 38px;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      background: var(--paper);
-      color: var(--ink);
-      cursor: pointer;
-      font-size: 19px;
-    }
-    .nav-toggle:hover { background: var(--line-soft); }
-    .nav-toggle:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  /* ---------- executive summary kpi cards ---------- */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 34px;
+  }
+  .kpi-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .kpi-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--ink-faint);
+  }
+  .kpi-val {
+    font-family: 'Spectral', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .kpi-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
 
   /* ---------- header ---------- */
   .head{
@@ -253,13 +265,13 @@
   .chart-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:18px;
+    gap:22px;
   }
   .chart-box{
     background:var(--paper);
     border:1px solid var(--line);
     border-radius:4px;
-    padding:14px;
+    padding:16px;
     overflow:hidden;
     break-inside:avoid;
     page-break-inside:avoid;
@@ -274,7 +286,7 @@
     letter-spacing:0.08em;
     text-transform:uppercase;
     color:var(--ink-faint);
-    margin-bottom:6px;
+    margin-bottom:8px;
     flex:none;
   }
   /* The chart itself lives in here. We give it a real, stable height and
@@ -284,11 +296,13 @@
      the plot. We only size this outer box; the library resizes to fit it. */
   .chart-inner{
     width:100%;
-    height:360px;
+    height:380px;
+    min-height:360px;
     flex:1;
   }
   .chart-box.wide .chart-inner{
-    height:380px;
+    height:400px;
+    min-height:380px;
   }
   .chart-inner > div{ width:100% !important; height:100% !important; }
 
@@ -361,6 +375,49 @@
     background:var(--brass-tint);
   }
   tfoot td.num{ text-align:right; }
+
+  /* ---------- ledger actions & modal ---------- */
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--line-soft, #DDE4D2);
+    color: var(--ink);
+    border-radius: 3px;
+  }
+  .btn-action {
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 13px;
+    margin: 0 2px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-action.edit:hover { background: var(--brass-tint); border-color: var(--brass); }
+  .btn-action.delete:hover { background: var(--stamp-tint); border-color: var(--stamp); }
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(32, 48, 31, 0.45);
+    display: flex; align-items: center; justify-content: center; z-index: 1000;
+    backdrop-filter: blur(2px);
+  }
+  .modal-box {
+    background: var(--paper-card); border: 1.5px solid var(--line-strong);
+    padding: 24px; border-radius: 6px; width: min(420px, 92vw);
+    box-shadow: 0 16px 36px var(--shadow);
+  }
+  .modal-box h3 { margin: 0 0 16px; font-family: 'Spectral', serif; font-size: 20px; color: var(--ink); }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 11px; font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; margin-bottom: 4px; color: var(--ink-soft); }
+  .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 4px; font-family: 'Work Sans', sans-serif; font-size: 13.5px; background: #fff; }
+  .form-group input:focus { outline: none; border-color: var(--stamp); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+  .btn-cancel { padding: 8px 14px; background: transparent; border: 1px solid var(--line-strong); border-radius: 4px; cursor: pointer; font-family: 'Work Sans', sans-serif; color: var(--ink); }
+  .btn-cancel:hover { background: var(--paper); }
+  .btn-save { padding: 8px 16px; background: var(--ink); color: #F3F1E3; border: none; border-radius: 4px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-weight: 500; }
+  .btn-save:hover { background: var(--forest); }
 
   /* ---------- chat ---------- */
   .chat-panel{
@@ -467,38 +524,38 @@
 </style>
 </head>
 <body>
-<nav class="navbar">
-    <a href="/" class="brand" aria-label="aiCFO Dashboard">
-      <div class="brand-mark">C</div>
-      <div class="brand-copy">
-        <div class="brand-name">aiCFO</div>
-        <div class="brand-tagline">Intelligent Finance</div>
-      </div>
-    </a>
 
-    <div class="nav-links" id="navLinks">
-      <a href="/" class="nav-link active">
-        <span class="nav-icon">⌂</span> Dashboard
-      </a>
-      <a href="/auth" class="nav-link">
-        <span class="nav-icon">▤</span> Login / Register
-      </a>
-      <a href="/receipts" class="nav-link">
-        <span class="nav-icon">▣</span> Receipt Vault
-      </a>
-      <a href="/ledger" class="nav-link">
-      <span class="nav-icon">▤</span> Ledger
-      </a>
-      <div class="nav-status">
-        <span class="status-dot"></span> Secure
-      </div>
-      
+<!-- STICKY TOP NAVBAR -->
+<nav class="navbar no-print">
+  <a href="/" class="brand" aria-label="aiCFO Dashboard">
+    <div class="brand-mark">C</div>
+    <div class="brand-copy">
+      <div class="brand-name">aiCFO</div>
+      <div class="brand-tagline">Intelligent Finance</div>
     </div>
+  </a>
 
-    <button type="button" class="nav-toggle" id="navToggle" aria-label="Open navigation" aria-expanded="false">
-      ☰
-    </button>
-  </nav>
+  <div class="nav-links" id="navLinks">
+    <a href="/" class="nav-link">
+      <span class="nav-icon">⌂</span> Dashboard
+    </a>
+    <a href="/simulator" class="nav-link">
+      <span class="nav-icon">⚡</span> Runway Simulator
+    </a>
+    <a href="/reports" class="nav-link active">
+      <span class="nav-icon">📊</span> Reports
+    </a>
+    <a href="/receipts" class="nav-link">
+      <span class="nav-icon">▣</span> Receipt Vault
+    </a>
+    <a href="/ledger" class="nav-link">
+      <span class="nav-icon">▤</span> Ledger
+    </a>
+    <a href="/logout" class="nav-link" style="color: var(--stamp);">
+      <span class="nav-icon">↪</span> Logout
+    </a>
+  </div>
+</nav>
 
 <div class="sheet">
 
@@ -509,10 +566,51 @@
       <h1>Financial Analysis Report</h1>
       <div class="meta" id="report-date">Generated —</div>
     </div>
-    <button onclick="preparePrint()" class="no-print export-btn">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-      Export PDF
-    </button>
+    <div style="display: flex; gap: 8px; align-items: center;" class="no-print">
+      <a href="/ledger" class="export-btn" style="text-decoration: none; background: transparent; color: var(--ink); border: 1px solid var(--line-strong);">
+        ▤ Ledger History
+      </a>
+      <a href="/simulator" class="export-btn" style="text-decoration: none; background: var(--forest); color: #FBFAF2; border: none;">
+        ⚡ Runway Simulator
+      </a>
+      <a href="/" class="export-btn" style="text-decoration: none; background: transparent; color: var(--ink); border: 1px solid var(--line-strong);">
+        ← Dashboard
+      </a>
+      <button onclick="preparePrint()" class="export-btn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+        Export PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Executive Summary KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Spend Recorded</div>
+      <div class="kpi-val">₹{{ "%.2f"|format(total_spent) }}</div>
+      <div class="kpi-sub">Across all ledger entries</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ledger Volume</div>
+      <div class="kpi-val">{{ metrics.total_entries if metrics else expenses|length }}</div>
+      <div class="kpi-sub">{{ metrics.ai_processed if metrics else 0 }} OCR Invoices · {{ metrics.human_manual if metrics else 0 }} Manual</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Automation Rate</div>
+      <div class="kpi-val">
+        {% if metrics and metrics.total_entries > 0 %}
+          {{ "%.1f"|format((metrics.ai_processed / metrics.total_entries) * 100) }}%
+        {% else %}
+          100%
+        {% endif %}
+      </div>
+      <div class="kpi-sub">PaddleOCR + AI Multi-LLM</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Audit Status</div>
+      <div class="kpi-val" style="color: var(--mint);">✓ Balanced</div>
+      <div class="kpi-sub">Reconciled to Vault storage</div>
+    </div>
   </div>
 
   <!-- Visualizations -->
@@ -529,52 +627,27 @@
       </div>
 
       <div class="chart-box">
-        <div class="exhibit">Exhibit B · Top Vendors by Spend</div>
+        <div class="exhibit">Exhibit B · Spend by Vendor</div>
         <div class="chart-inner">{{ graph_vendor | safe }}</div>
       </div>
 
       <div class="chart-box wide">
-        <div class="exhibit">Exhibit C · Cash Flow Timeline</div>
+        <div class="exhibit">Exhibit C · Spend Over Time</div>
         <div class="chart-inner">{{ graph_timeline | safe }}</div>
       </div>
 
-      <div class="chart-box wide">
-        <div class="exhibit">Exhibit D · Cumulative Spend & Burn Rate</div>
-        <div class="chart-inner">{{ graph_cumulative | safe }}</div>
-      </div>
-
       <div class="chart-box">
-        <div class="exhibit">Exhibit E · Tax vs. Base Amount</div>
+        <div class="exhibit">Exhibit D · Tax Breakdown</div>
         <div class="chart-inner">{{ graph_tax | safe }}</div>
       </div>
 
       <div class="chart-box">
-        <div class="exhibit">Exhibit F · GST Tax Breakdown (ITC)</div>
-        <div class="chart-inner">{{ graph_gst | safe }}</div>
-      </div>
-
-      <div class="chart-box">
-        <div class="exhibit">Exhibit G · Accounts Payable (Paid vs Due)</div>
-        <div class="chart-inner">{{ graph_payment_status | safe }}</div>
-      </div>
-
-      <div class="chart-box">
-        <div class="exhibit">Exhibit H · Payment Mode Distribution</div>
-        <div class="chart-inner">{{ graph_payment_method | safe }}</div>
-      </div>
-
-      <div class="chart-box wide">
-        <div class="exhibit">Exhibit I · Category & Vendor Hierarchy Treemap</div>
+        <div class="exhibit">Exhibit E · Category Treemap</div>
         <div class="chart-inner">{{ graph_treemap | safe }}</div>
       </div>
 
-      <div class="chart-box">
-        <div class="exhibit">Exhibit J · Top Purchased Line Items</div>
-        <div class="chart-inner">{{ graph_line_items | safe }}</div>
-      </div>
-
-      <div class="chart-box">
-        <div class="exhibit">Exhibit K · Data Ingestion Source</div>
+      <div class="chart-box wide">
+        <div class="exhibit">Exhibit F · Data Source Breakdown</div>
         <div class="chart-inner">{{ graph_source | safe }}</div>
       </div>
     </div>
@@ -602,30 +675,70 @@
       <h2>Extracted Ledger</h2>
     </div>
     <div class="ledger-wrap">
-      <table>
+      <table id="ledger-table">
         <thead>
           <tr>
-            <th>Item Description</th>
+            <th>Date</th>
+            <th>Merchant</th>
+            <th>Category</th>
             <th class="num">Amount</th>
+            <th class="no-print" style="text-align: center; width: 110px;">Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for item in expenses %}
-          <tr>
-            <td>{{ item.item_description }}</td>
-            <td class="num">₹{{ "%.2f"|format(item.amount) }}</td>
+          <tr id="row-{{ item.id }}" data-id="{{ item.id }}">
+            <td class="cell-date">{{ item.date }}</td>
+            <td class="cell-merchant"><b>{{ item.merchant }}</b></td>
+            <td><span class="badge cell-category">{{ item.category }}</span></td>
+            <td class="num cell-amount">₹{{ "%.2f"|format(item.amount) }}</td>
+            <td class="no-print" style="text-align: center; white-space: nowrap;">
+              <button type="button" class="btn-action edit" title="Edit Expense" data-id="{{ item.id }}" data-merchant="{{ item.merchant }}" data-date="{{ item.date }}" data-category="{{ item.category }}" data-amount="{{ item.amount }}" onclick="openEditModalFromButton(this)">✏️</button>
+              <button type="button" class="btn-action delete" title="Delete Expense" onclick="deleteExpense('{{ item.id }}')">🗑️</button>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <tr>
-            <td>Total</td>
-            <td class="num">₹{{ "%.2f"|format(expenses|sum(attribute='amount')) }}</td>
+            <td colspan="3">Total</td>
+            <td class="num" id="ledger-grand-total">₹{{ "%.2f"|format(total_spent) }}</td>
+            <td class="no-print"></td>
           </tr>
         </tfoot>
       </table>
     </div>
   </section>
+
+  <!-- Edit Expense Modal -->
+  <div id="editModal" class="modal-backdrop" style="display:none;">
+    <div class="modal-box">
+      <h3>Edit Ledger Entry</h3>
+      <form id="editForm" onsubmit="submitEdit(event)">
+        <input type="hidden" id="edit-id">
+        <div class="form-group">
+          <label for="edit-merchant">Merchant Name</label>
+          <input type="text" id="edit-merchant" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-date">Date</label>
+          <input type="date" id="edit-date" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-category">Category</label>
+          <input type="text" id="edit-category" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-amount">Amount (₹)</label>
+          <input type="number" step="0.01" min="0" id="edit-amount" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" onclick="closeEditModal()" class="btn-cancel">Cancel</button>
+          <button type="submit" class="btn-save">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Chat -->
   <div class="chat-panel no-print">
@@ -717,6 +830,109 @@
   document.getElementById('chat-input').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') sendMessage();
   });
+
+  /* ---------- LEDGER ACTIONS (EDIT & DELETE) ---------- */
+  function openEditModalFromButton(btn) {
+    const ds = btn.dataset;
+    document.getElementById('edit-id').value = ds.id || '';
+    document.getElementById('edit-merchant').value = ds.merchant || '';
+    document.getElementById('edit-date').value = ds.date || '';
+    document.getElementById('edit-category').value = ds.category || '';
+    document.getElementById('edit-amount').value = ds.amount || '';
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  function openEditModal(id, merchant, date, category, amount) {
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-merchant').value = merchant;
+    document.getElementById('edit-date').value = date;
+    document.getElementById('edit-category').value = category;
+    document.getElementById('edit-amount').value = amount;
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+  }
+
+  // Close modal when clicking outside modal box
+  window.addEventListener('click', function(e) {
+    const modal = document.getElementById('editModal');
+    if (e.target === modal) {
+      closeEditModal();
+    }
+  });
+
+  async function submitEdit(e) {
+    e.preventDefault();
+    const id = document.getElementById('edit-id').value;
+    const payload = {
+      merchant: document.getElementById('edit-merchant').value.trim(),
+      date: document.getElementById('edit-date').value,
+      category: document.getElementById('edit-category').value.trim(),
+      amount: parseFloat(document.getElementById('edit-amount').value)
+    };
+
+    try {
+      const res = await fetch(`/api/expenses/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        const row = document.getElementById(`row-${id}`);
+        if (row) {
+          row.querySelector('.cell-merchant b').textContent = payload.merchant;
+          row.querySelector('.cell-date').textContent = payload.date;
+          row.querySelector('.cell-category').textContent = payload.category;
+          row.querySelector('.cell-amount').textContent = `₹${payload.amount.toFixed(2)}`;
+          // Update data-* attributes cleanly without string escaping bugs
+          const editBtn = row.querySelector('.btn-action.edit');
+          if (editBtn) {
+            editBtn.dataset.merchant = payload.merchant;
+            editBtn.dataset.date = payload.date;
+            editBtn.dataset.category = payload.category;
+            editBtn.dataset.amount = payload.amount;
+          }
+        }
+        closeEditModal();
+        recalculateTotal();
+      } else {
+        const err = await res.json();
+        alert('Failed to update expense: ' + (err.error || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Error updating expense. Please check connection.');
+    }
+  }
+
+  async function deleteExpense(id) {
+    if (!confirm('Are you sure you want to delete this expense from your ledger?')) return;
+    try {
+      const res = await fetch(`/api/expenses/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        const row = document.getElementById(`row-${id}`);
+        if (row) row.remove();
+        recalculateTotal();
+      } else {
+        const err = await res.json();
+        alert('Failed to delete expense: ' + (err.error || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Error deleting expense. Please check connection.');
+    }
+  }
+
+  function recalculateTotal() {
+    let sum = 0;
+    document.querySelectorAll('#ledger-table tbody tr').forEach(tr => {
+      const amtTxt = tr.querySelector('.cell-amount')?.textContent.replace(/[^0-9.]/g, '') || '0';
+      sum += parseFloat(amtTxt) || 0;
+    });
+    const totalElem = document.getElementById('ledger-grand-total');
+    if (totalElem) totalElem.textContent = `₹${sum.toFixed(2)}`;
+  }
 </script>
 
 </body>

@@ -1,0 +1,77 @@
+
+
+===== 5_22482771_receipt22.png =====
+
+Capital PO
+Field
+Extracted Value
+Document Type
+Capital PO
+Vendor ID
+12000110
+Vendor Name
+SAIEN WELDS PVT LTD
+Vendor Address
+PUNE Plot-233, Sector-7, P.C.N.T.D.A, Pune-411026, MH, IN
+Vendor Phone
+Not clearly visible
+Vendor GSTIN
+27AARCS2691H1ZS
+Vendor Email
+sales@saienweld.com
+Purchase Order No
+1200000165
+PO Date
+27-05-2026
+Quotation Ref No.
+Not available
+Storage Location
+BSR1
+Deliver To
+Duroshox International Private Limited
+Delivery Address
+Gat No.1258/1259, Pune-Nagar Road, Sanaswadi, Taluka Shirur,
+Pune-412208, MH, IN
+GSTIN (Buyer)
+27AAICD4953A1ZT
+PAN No.
+AAICD4953A
+Item Code
+90004138
+Item Description
+HYDRAULIC ROLL MARKING MACHINE
+HSN/SAC Code
+84798999
+Asset Number
+20000455
+Quantity
+1
+UOM
+EA
+Rate (INR)
+7,95,000.00
+CGST %
+9.00
+SGST %
+9.00
+IGST %
+0.00
+Discount %
+0.00
+Amount (INR)
+9,38,100.00
+Total Amount
+9,38,100.00
+Amount in Words
+NINE LAKH THIRTY EIGHT THOUSAND ONE HUNDRED
+ONLY
+Payment Terms
+30% Advance basic amount against PO, 60% against proforma
+invoice before dispatch, Full GST payment against GST filing proof
+submission, 10% after I&C against 10% PBG valid for 1 year
+Mode of Dispatch
+By Road
+Delivery Date
+30-07-2026
+Freight
+Include

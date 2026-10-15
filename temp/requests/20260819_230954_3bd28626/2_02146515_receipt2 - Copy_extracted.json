@@ -1,0 +1,74 @@
+{
+    "document_metadata": {
+        "billing_period_end": null,
+        "billing_period_start": null,
+        "currency_code": null,
+        "document_type": null,
+        "due_date": null,
+        "expense_category": null,
+        "invoice_date": null,
+        "invoice_number": null,
+        "nature_of_transaction": null,
+        "order_number": null,
+        "place_of_supply": null,
+        "tracking_or_packet_id": null
+    },
+    "seller_details": {
+        "billing_address": null,
+        "contact_email": null,
+        "contact_phone": null,
+        "pan_or_company_id": null,
+        "platform_or_marketplace": null,
+        "shipping_address": null,
+        "tax_id_gstin": null,
+        "vendor_name": null
+    },
+    "buyer_details": {
+        "billing_address": null,
+        "customer_company": null,
+        "customer_name": null,
+        "customer_type": null,
+        "shipping_address": null,
+        "tax_id_gstin": null
+    },
+    "financial_totals": {
+        "amount_paid": null,
+        "balance_due": null,
+        "grand_total": null,
+        "gross_amount_pre_discount": null,
+        "other_charges": null,
+        "shipping_and_handling_charges": null,
+        "taxable_amount_subtotal": null,
+        "total_discount_amount": null,
+        "total_tax_amount": null
+    },
+    "tax_breakdown": {
+        "cgst_amount": null,
+        "igst_amount": null,
+        "sales_tax_amount": null,
+        "sgst_amount": null,
+        "tax_cess_amount": null,
+        "vat_amount": null
+    },
+    "payment_details": {
+        "payment_date": null,
+        "payment_method": null,
+        "payment_transaction_id": null
+    },
+    "line_items": [],
+    "source_file": "2_02146515_receipt2 - Copy.jpg",
+    "raw_ocr_text_reference": "1B\nty\nOOD\n000\nh\n050.00\nRoast\n99.00\nBasi\n49.00\n2\nChickenDumni.\nD Duam Bi\n0\nDTRDE\nP11\nDIRO EYE CHILL\nWIN1399.00\n11\nTotal\nO\nM\nHOD\n0\n---\nSincity Cider-Pit21758\nSampl\nSampler\nSinc\nity\n1\nsamprel\nWOr\na sel\nsub1oca1\n00\ntC-t@258\nstateGstez.s\nRoundoff",
+    "validation": {
+        "status": "UNKNOWN",
+        "line_items_count": 0,
+        "valid_line_items": 0,
+        "line_items_total": 0.0,
+        "grand_total": null,
+        "line_items_difference": null,
+        "accounting_total": null,
+        "accounting_difference": null,
+        "tax_breakdown_total": 0.0,
+        "tax_difference": null
+    },
+    "document_hash": "6bc4304c7f660fa0ff1ce3ba0c9edbf45cc3e3deda7841da90237c59fa217423"
+}

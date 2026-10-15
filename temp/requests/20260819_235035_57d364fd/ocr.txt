@@ -1,0 +1,33 @@
+
+
+===== 4_ef81f9ee_receipt18.jpg =====
+
+x
+Fees Receipt
+Krish Anilkumar Gupta
+PRN No. :
+College: B. V. COLLEGE OF ENGINEERING, LAVALE
+Faculty: Computer Engineering
+RECEIPT NO :
+00787085
+RECEIPT DATE :
+12/08/2024
+PAYMENT ID :
+113414873703
+TRANSACTION ID :
+105353433517
+PAYMENT MODE :
+upi
+DESCRIPTION
+SEMESTER
+YEAR
+AMOUNT
+Exam Fee
+0th
+2nd Year
+1000.00
+Terms & Conditions
+Thank you for your payment. College fees policies applicable.
+This is computer generated receipt, so does not require
+signature.
+Thank you

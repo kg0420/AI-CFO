@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>aiCFO — Financial Runway & Scenario Simulator</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --paper: #EFEDDF;
+      --paper-card: #FBFAF2;
+      --line: #D8DECB;
+      --line-strong: #C3CBB4;
+      --line-soft: #DDE4D2;
+      --ink: #20301F;
+      --ink-soft: #57644F;
+      --ink-faint: #8B9682;
+      --stamp: #A5382B;
+      --stamp-dim: #C17569;
+      --stamp-tint: #F4E7E3;
+      --brass: #A9822F;
+      --brass-tint: #F2ECD9;
+      --forest: #20402F;
+      --forest-dark: #152B20;
+      --mint: #5F7A5A;
+      --shadow: rgba(32, 48, 31, 0.16);
+      --success: #2E7D32;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background-color: var(--paper);
+      background-image:
+        repeating-linear-gradient(to bottom, transparent 0 30px, #E4E2D2 30px 31px),
+        radial-gradient(1100px 500px at 10% -10%, rgba(169, 130, 47, 0.08), transparent 55%),
+        radial-gradient(900px 500px at 105% 105%, rgba(165, 56, 43, 0.06), transparent 50%);
+      color: var(--ink);
+      font-family: 'Work Sans', sans-serif;
+      padding: 0 0 60px 0;
+      min-height: 100vh;
+    }
+
+    /* ---------- NAVBAR ---------- */
+    .navbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      width: min(1120px, calc(100% - 32px));
+      margin: 16px auto 24px;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 16px;
+      background: rgba(251, 250, 242, 0.96);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: 0 12px 32px -20px var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--forest);
+      color: #F3F1E3;
+      border-radius: 4px;
+      font-family: 'Spectral', serif;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .brand-copy { display: flex; flex-direction: column; }
+    .brand-name { font-family: 'Spectral', serif; font-size: 20px; font-weight: 700; line-height: 1; }
+    .brand-tagline { margin-top: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
+
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      transition: all .2s ease;
+    }
+    .nav-link:hover { color: var(--ink); background: var(--paper); }
+    .nav-link.active { color: var(--stamp); background: #F3EFE3; border-bottom: 2px solid var(--stamp); }
+
+    /* ---------- MAIN CONTAINER ---------- */
+    .container {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .sheet {
+      background: var(--paper-card);
+      border-radius: 4px;
+      box-shadow: 0 18px 44px -18px var(--shadow);
+      padding: clamp(24px, 4vw, 44px);
+      position: relative;
+      border: 1px solid var(--line);
+    }
+    .sheet::before, .sheet::after {
+      content: "";
+      position: absolute; left: 0; right: 0; height: 16px;
+      background-image: radial-gradient(circle at 10px 8px, var(--paper) 9px, transparent 9.5px);
+      background-size: 20px 18px;
+      background-repeat: repeat-x;
+    }
+    .sheet::before { top: -9px; }
+    .sheet::after { bottom: -9px; transform: scaleY(-1); }
+
+    /* ---------- HEADER ---------- */
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px dashed var(--line);
+      margin-bottom: 28px;
+    }
+    .eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--brass);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    h1 {
+      margin: 0;
+      font-family: 'Spectral', serif;
+      font-size: clamp(26px, 3.5vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+    }
+    .subtitle {
+      margin: 6px 0 0;
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      max-width: 650px;
+      line-height: 1.5;
+    }
+
+    /* ---------- KPI SUMMARY CARDS ---------- */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 30px;
+    }
+    .kpi-card {
+      background: #FDFCF8;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 16px;
+      position: relative;
+      transition: transform .2s ease;
+    }
+    .kpi-card:hover { transform: translateY(-2px); }
+    .kpi-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 6px;
+    }
+    .kpi-value {
+      font-family: 'Spectral', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .kpi-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9.5px;
+      color: var(--ink-soft);
+      margin-top: 5px;
+    }
+    .badge-status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* ---------- PRESETS BAR ---------- */
+    .presets-wrap {
+      background: #F5F3E8;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 14px 18px;
+      margin-bottom: 28px;
+    }
+    .presets-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--ink-soft);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .preset-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .btn-preset {
+      background: var(--paper-card);
+      border: 1px solid var(--line-strong);
+      padding: 7px 12px;
+      border-radius: 4px;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .15s ease;
+    }
+    .btn-preset:hover {
+      background: var(--forest);
+      color: #fff;
+      border-color: var(--forest);
+    }
+
+    /* ---------- SIMULATION CONTROL DECK ---------- */
+    .deck-section {
+      margin-bottom: 32px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #FAF8F0;
+      padding: 22px;
+    }
+    .deck-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed var(--line);
+    }
+    .deck-header h2 {
+      margin: 0;
+      font-family: 'Spectral', serif;
+      font-size: 20px;
+      color: var(--ink);
+    }
+    .deck-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px 28px;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .control-hint {
+      font-size: 11px;
+      color: var(--ink-faint);
+    }
+    .control-val-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      color: var(--forest);
+      font-weight: 600;
+    }
+    .slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    input[type="range"] {
+      flex: 1;
+      height: 6px;
+      accent-color: var(--forest);
+      cursor: pointer;
+    }
+    .num-input {
+      width: 100px;
+      padding: 6px 8px;
+      border: 1px solid var(--line-strong);
+      border-radius: 3px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11.5px;
+      color: var(--ink);
+      background: var(--paper-card);
+      text-align: right;
+    }
+    .deck-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .btn-apply {
+      background: var(--forest);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+    .btn-apply:hover { background: #152B20; }
+    .btn-reset {
+      background: transparent;
+      color: var(--ink-soft);
+      border: 1px solid var(--line);
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .btn-reset:hover { background: var(--paper); }
+
+    /* ---------- CHARTS SECTION ---------- */
+    .chart-box {
+      background: #FAF8F0;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .chart-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9.5px;
+      color: var(--brass);
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .chart-box h3 {
+      margin: 0 0 14px 0;
+      font-family: 'Spectral', serif;
+      font-size: 19px;
+      color: var(--ink);
+    }
+
+    /* ---------- AI CFO ADVISORY PANEL ---------- */
+    .ai-advisory-panel {
+      background: #FDFCF7;
+      border: 1.5px solid var(--brass);
+      border-radius: 4px;
+      padding: 24px;
+      margin-top: 32px;
+      position: relative;
+    }
+    .ai-advisory-panel::before {
+      content: "✦ AI ADVISOR";
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background: var(--brass);
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8.5px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      padding: 2px 7px;
+      border-radius: 2px;
+    }
+    .ai-advisory-content h3 {
+      font-family: 'Spectral', serif;
+      font-size: 16px;
+      color: var(--forest);
+      margin: 16px 0 6px 0;
+    }
+    .ai-advisory-content h3:first-child { margin-top: 0; }
+    .ai-advisory-content p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink);
+      margin: 0 0 12px 0;
+    }
+    .ai-advisory-content ul {
+      margin: 6px 0 14px 20px;
+      padding: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+    .ai-advisory-content li { margin-bottom: 6px; }
+    .btn-generate-ai {
+      background: var(--brass);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 10px;
+    }
+    .btn-generate-ai:hover { background: #8C6A21; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar { flex-wrap: wrap; gap: 10px; }
+      .nav-links { overflow-x: auto; width: 100%; padding-bottom: 4px; }
+      .head { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="/" class="brand">
+      <div class="brand-mark">C</div>
+      <div class="brand-copy">
+        <span class="brand-name">aiCFO</span>
+        <span class="brand-tagline">Financial Command Center</span>
+      </div>
+    </a>
+
+    <div class="nav-links">
+      <a href="/" class="nav-link">⌂ Dashboard</a>
+      <a href="/simulator" class="nav-link active">⚡ Runway Simulator</a>
+      <a href="/reports" class="nav-link">📊 Reports</a>
+      <a href="/receipts" class="nav-link">▣ Vault</a>
+      <a href="/ledger" class="nav-link">▤ Ledger</a>
+      <a href="/logout" class="nav-link" style="color: var(--stamp);">↪ Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="sheet">
+
+      <!-- Header -->
+      <div class="head">
+        <div>
+          <div class="eyebrow">aiCFO · Financial Safety & Runway Modeling</div>
+          <h1>Runway & Survival Simulator</h1>
+          <p class="subtitle">
+            Simulate your savings safety net, project your zero-cash horizon, and model "What-If" income and lifestyle scenarios tailored for everyday households and modern organizations.
+          </p>
+        </div>
+        <div>
+          <button type="button" class="btn-preset" onclick="window.print()" style="font-family: 'IBM Plex Mono'; font-size: 10px;">
+            ⎙ Print Forecast
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Current Savings Reserve</div>
+          <div class="kpi-value" id="kpi-savings">₹{{ "{:,.0f}".format(simulation.inputs.savings_balance) }}</div>
+          <div class="kpi-sub">Liquid Bank / Emergency Balance</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Monthly Living Expenses</div>
+          <div class="kpi-value" id="kpi-burn">₹{{ "{:,.0f}".format(simulation.inputs.baseline_monthly_expenses) }}</div>
+          <div class="kpi-sub">Based on historical ledger</div>
+        </div>
+
+        <div class="kpi-card" style="border-left: 3px solid {{ simulation.results.status_badge.color }};">
+          <div class="kpi-label">Simulated Runway</div>
+          <div class="kpi-value" id="kpi-runway">{{ simulation.results.simulated_runway_months }}</div>
+          <div class="badge-status" id="kpi-badge" style="background: {{ simulation.results.status_badge.color }}; color: #fff;">
+            {{ simulation.results.status_badge.label }}
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-label">Estimated Zero-Cash Date</div>
+          <div class="kpi-value" id="kpi-zero-date" style="font-size: 19px; padding-top: 3px;">
+            {{ simulation.results.simulated_zero_date }}
+          </div>
+          <div class="kpi-sub" id="kpi-delta">Lifeline Impact: <b>{{ simulation.results.runway_delta_str }}</b></div>
+        </div>
+      </div>
+
+      <!-- Scenario Quick Presets -->
+      <div class="presets-wrap">
+        <div class="presets-title">⚡ Quick Life & Business Scenarios (Click to Test)</div>
+        <div class="preset-btns">
+          <button type="button" class="btn-preset" onclick="applyPreset('emergency')">
+            🚨 Emergency Mode (Zero Income / Job Loss)
+          </button>
+          <button type="button" class="btn-preset" onclick="applyPreset('discipline')">
+            ✂️ Budget Cut (Trim 20% Discretionary Spend)
+          </button>
+          <button type="button" class="btn-preset" onclick="applyPreset('hike')">
+            💼 Salary Increase / Side Inflow (+25% Income)
+          </button>
+          <button type="button" class="btn-preset" onclick="applyPreset('vacation')">
+            🏖️ Major Planned Expense (₹50k Vacation/Capex)
+          </button>
+          <button type="button" class="btn-preset" onclick="applyPreset('balanced')">
+            ⚖️ Balanced Household (Reset Default)
+          </button>
+        </div>
+      </div>
+
+      <!-- Simulation Form & Controls -->
+      <form id="simForm" class="deck-section" onsubmit="event.preventDefault(); triggerSimulation();">
+        <div class="deck-header">
+          <div>
+            <h2>"What-If" Life & Cash Flow Scenario Controls</h2>
+            <div style="font-size: 12px; color: var(--ink-soft); margin-top: 3px;">
+              Adjust savings, income changes, and planned life events to see instant changes to your financial lifeline.
+            </div>
+          </div>
+          <button type="button" class="btn-reset" onclick="resetForm()">↺ Reset</button>
+        </div>
+
+        <div class="deck-grid">
+          <!-- 1. Savings -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>Savings / Liquid Bank Fund</span>
+              <span class="control-val-badge" id="lbl-savings">₹{{ "{:,.0f}".format(simulation.inputs.savings_balance) }}</span>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" id="savings_balance" min="10000" max="5000000" step="10000" value="{{ simulation.inputs.savings_balance }}" oninput="syncVal('savings_balance', 'lbl-savings', '₹')">
+              <input type="number" class="num-input" id="num-savings_balance" value="{{ simulation.inputs.savings_balance }}" onchange="syncNum('savings_balance', this.value)">
+            </div>
+            <span class="control-hint">Your current available emergency fund & checking cash</span>
+          </div>
+
+          <!-- 2. Baseline Monthly Expenses -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>Base Monthly Living Expenses</span>
+              <span class="control-val-badge" id="lbl-burn">₹{{ "{:,.0f}".format(simulation.inputs.baseline_monthly_expenses) }}</span>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" id="baseline_monthly_expenses" min="5000" max="500000" step="5000" value="{{ simulation.inputs.baseline_monthly_expenses }}" oninput="syncVal('baseline_monthly_expenses', 'lbl-burn', '₹')">
+              <input type="number" class="num-input" id="num-baseline_monthly_expenses" value="{{ simulation.inputs.baseline_monthly_expenses }}" onchange="syncNum('baseline_monthly_expenses', this.value)">
+            </div>
+            <span class="control-hint">Normal monthly essentials: rent, groceries, EMIs, utilities</span>
+          </div>
+
+          <!-- 3. Monthly Inflow -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>Monthly Inflow (Salary / Revenue)</span>
+              <span class="control-val-badge" id="lbl-income">₹{{ "{:,.0f}".format(simulation.inputs.monthly_income) }}</span>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" id="monthly_income" min="0" max="500000" step="5000" value="{{ simulation.inputs.monthly_income }}" oninput="syncVal('monthly_income', 'lbl-income', '₹')">
+              <input type="number" class="num-input" id="num-monthly_income" value="{{ simulation.inputs.monthly_income }}" onchange="syncNum('monthly_income', this.value)">
+            </div>
+            <span class="control-hint">Expected monthly take-home salary or sales revenue</span>
+          </div>
+
+          <!-- 4. Expected Income Change % -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>Expected Income Change</span>
+              <span class="control-val-badge" id="lbl-income-pct">{{ "{:+.0f}".format(simulation.inputs.income_change_pct) }}%</span>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" id="income_change_pct" min="-100" max="100" step="5" value="{{ simulation.inputs.income_change_pct }}" oninput="syncVal('income_change_pct', 'lbl-income-pct', '', '%')">
+              <input type="number" class="num-input" id="num-income_change_pct" value="{{ simulation.inputs.income_change_pct }}" onchange="syncNum('income_change_pct', this.value)">
+            </div>
+            <span class="control-hint">-100% for job loss, +10% to +30% for promotion/hike</span>
+          </div>
+
+          <!-- 5. Expense Trim % -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>Lifestyle / Opex Cut</span>
+              <span class="control-val-badge" id="lbl-cut-pct">{{ "{:.0f}".format(simulation.inputs.expense_cut_pct) }}%</span>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" id="expense_cut_pct" min="0" max="60" step="5" value="{{ simulation.inputs.expense_cut_pct }}" oninput="syncVal('expense_cut_pct', 'lbl-cut-pct', '', '%')">
+              <input type="number" class="num-input" id="num-expense_cut_pct" value="{{ simulation.inputs.expense_cut_pct }}" onchange="syncNum('expense_cut_pct', this.value)">
+            </div>
+            <span class="control-hint">Savings by reducing dining, shopping, and subscriptions</span>
+          </div>
+
+          <!-- 6. Extra Monthly Expenses -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>Extra Monthly Additions (EMIs/Hires)</span>
+              <span class="control-val-badge" id="lbl-extra">₹{{ "{:,.0f}".format(simulation.inputs.extra_monthly_expense) }}</span>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" id="extra_monthly_expense" min="0" max="200000" step="2500" value="{{ simulation.inputs.extra_monthly_expense }}" oninput="syncVal('extra_monthly_expense', 'lbl-extra', '₹')">
+              <input type="number" class="num-input" id="num-extra_monthly_expense" value="{{ simulation.inputs.extra_monthly_expense }}" onchange="syncNum('extra_monthly_expense', this.value)">
+            </div>
+            <span class="control-hint">New loan EMI, team hire, school tuition, or new rent</span>
+          </div>
+
+          <!-- 7. One-Time Planned Expense -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>One-Time Big Expense</span>
+              <span class="control-val-badge" id="lbl-capex">₹{{ "{:,.0f}".format(simulation.inputs.one_time_expense) }}</span>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" id="one_time_expense" min="0" max="500000" step="10000" value="{{ simulation.inputs.one_time_expense }}" oninput="syncVal('one_time_expense', 'lbl-capex', '₹')">
+              <input type="number" class="num-input" id="num-one_time_expense" value="{{ simulation.inputs.one_time_expense }}" onchange="syncNum('one_time_expense', this.value)">
+            </div>
+            <span class="control-hint">Major purchase: holiday trip, down payment, laptop, medical</span>
+          </div>
+
+          <!-- 8. One-Time Month Target -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>Planned Month for Big Expense</span>
+              <span class="control-val-badge" id="lbl-month">Month {{ simulation.inputs.one_time_month }}</span>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" id="one_time_month" min="1" max="18" step="1" value="{{ simulation.inputs.one_time_month }}" oninput="syncVal('one_time_month', 'lbl-month', 'Month ')">
+              <input type="number" class="num-input" id="num-one_time_month" value="{{ simulation.inputs.one_time_month }}" onchange="syncNum('one_time_month', this.value)">
+            </div>
+            <span class="control-hint">Which upcoming month this planned purchase will occur</span>
+          </div>
+        </div>
+
+        <div class="deck-actions">
+          <button type="submit" class="btn-apply">⚡ Recalculate Lifeline</button>
+        </div>
+      </form>
+
+      <!-- Charts Section -->
+      <div class="chart-box">
+        <div class="chart-tag">Exhibit S-01 · Treasury Lifeline</div>
+        <h3>Projected Bank Balance & Runway Trajectory</h3>
+        <div id="chart-trajectory">
+          {{ simulation.charts.trajectory_html | safe }}
+        </div>
+      </div>
+
+      <div class="chart-box">
+        <div class="chart-tag">Exhibit S-02 · Cash Flow Dynamics</div>
+        <h3>Monthly Inflow vs Expenses & Savings Capacity</h3>
+        <div id="chart-cashflow">
+          {{ simulation.charts.cashflow_html | safe }}
+        </div>
+      </div>
+
+      <!-- AI CFO Strategic Advisory Panel -->
+      <div class="ai-advisory-panel">
+        <div class="ai-advisory-content" id="advisory-text">
+          {{ advisory_html | safe }}
+        </div>
+        <button type="button" class="btn-generate-ai" id="btn-ai" onclick="refreshAIAdvisory()">
+          <span>✨ Re-evaluate Strategy with AI CFO</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function syncVal(sliderId, labelId, prefix = '', suffix = '') {
+      const slider = document.getElementById(sliderId);
+      const numInput = document.getElementById('num-' + sliderId);
+      const label = document.getElementById(labelId);
+      const val = parseFloat(slider.value) || 0;
+      if (numInput) numInput.value = val;
+      if (label) {
+        if (prefix === '₹') {
+          label.textContent = '₹' + val.toLocaleString('en-IN');
+        } else {
+          label.textContent = prefix + (val > 0 && suffix === '%' ? '+' : '') + val + suffix;
+        }
+      }
+    }
+
+    function syncNum(sliderId, val) {
+      const slider = document.getElementById(sliderId);
+      if (slider) {
+        slider.value = val;
+        slider.dispatchEvent(new Event('input'));
+      }
+    }
+
+    async function triggerSimulation() {
+      const payload = {
+        savings_balance: parseFloat(document.getElementById('savings_balance').value) || 0,
+        baseline_monthly_expenses: parseFloat(document.getElementById('baseline_monthly_expenses').value) || 30000,
+        monthly_income: parseFloat(document.getElementById('monthly_income').value) || 0,
+        income_change_pct: parseFloat(document.getElementById('income_change_pct').value) || 0,
+        expense_cut_pct: parseFloat(document.getElementById('expense_cut_pct').value) || 0,
+        extra_monthly_expense: parseFloat(document.getElementById('extra_monthly_expense').value) || 0,
+        one_time_expense: parseFloat(document.getElementById('one_time_expense').value) || 0,
+        one_time_month: parseInt(document.getElementById('one_time_month').value) || 1,
+        horizon_months: 24
+      };
+
+      try {
+        const res = await fetch('/api/simulator/simulate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          // Update KPIs
+          document.getElementById('kpi-savings').textContent = '₹' + payload.savings_balance.toLocaleString('en-IN');
+          document.getElementById('kpi-burn').textContent = '₹' + payload.baseline_monthly_expenses.toLocaleString('en-IN');
+          document.getElementById('kpi-runway').textContent = data.results.simulated_runway_months;
+          document.getElementById('kpi-zero-date').textContent = data.results.simulated_zero_date;
+          document.getElementById('kpi-delta').innerHTML = 'Lifeline Impact: <b>' + data.results.runway_delta_str + '</b>';
+          
+          const badge = document.getElementById('kpi-badge');
+          badge.textContent = data.results.status_badge.label;
+          badge.style.background = data.results.status_badge.color;
+
+          // Replace Chart HTML
+          if (data.charts.trajectory_html) {
+            document.getElementById('chart-trajectory').innerHTML = data.charts.trajectory_html;
+            // Execute scripts in injected plotly HTML
+            runInjectedScripts(document.getElementById('chart-trajectory'));
+          }
+          if (data.charts.cashflow_html) {
+            document.getElementById('chart-cashflow').innerHTML = data.charts.cashflow_html;
+            runInjectedScripts(document.getElementById('chart-cashflow'));
+          }
+        }
+      } catch (err) {
+        console.error('Simulation error:', err);
+      }
+    }
+
+    function runInjectedScripts(container) {
+      const scripts = container.querySelectorAll('script');
+      scripts.forEach(s => {
+        const newScript = document.createElement('script');
+        newScript.text = s.text;
+        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+      });
+    }
+
+    async function refreshAIAdvisory() {
+      const btn = document.getElementById('btn-ai');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Consulting AI CFO...</span>';
+
+      const payload = {
+        savings_balance: parseFloat(document.getElementById('savings_balance').value) || 0,
+        baseline_monthly_expenses: parseFloat(document.getElementById('baseline_monthly_expenses').value) || 30000,
+        monthly_income: parseFloat(document.getElementById('monthly_income').value) || 0,
+        income_change_pct: parseFloat(document.getElementById('income_change_pct').value) || 0,
+        expense_cut_pct: parseFloat(document.getElementById('expense_cut_pct').value) || 0,
+        extra_monthly_expense: parseFloat(document.getElementById('extra_monthly_expense').value) || 0,
+        one_time_expense: parseFloat(document.getElementById('one_time_expense').value) || 0,
+        one_time_month: parseInt(document.getElementById('one_time_month').value) || 1,
+      };
+
+      try {
+        const res = await fetch('/api/simulator/advisory', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.advisory_html) {
+          document.getElementById('advisory-text').innerHTML = data.advisory_html;
+        }
+      } catch (err) {
+        alert('Could not generate AI advisory. Please verify server connection.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    function applyPreset(type) {
+      if (type === 'emergency') {
+        // Zero income, no lifestyle cuts yet
+        document.getElementById('income_change_pct').value = -100;
+        document.getElementById('expense_cut_pct').value = 0;
+        document.getElementById('extra_monthly_expense').value = 0;
+        document.getElementById('one_time_expense').value = 0;
+      } else if (type === 'discipline') {
+        // Cut 20% expenses
+        document.getElementById('income_change_pct').value = 0;
+        document.getElementById('expense_cut_pct').value = 20;
+        document.getElementById('extra_monthly_expense').value = 0;
+        document.getElementById('one_time_expense').value = 0;
+      } else if (type === 'hike') {
+        // +25% income
+        document.getElementById('income_change_pct').value = 25;
+        document.getElementById('expense_cut_pct').value = 0;
+        document.getElementById('extra_monthly_expense').value = 0;
+        document.getElementById('one_time_expense').value = 0;
+      } else if (type === 'vacation') {
+        // 50k capex in month 2
+        document.getElementById('one_time_expense').value = 50000;
+        document.getElementById('one_time_month').value = 2;
+        document.getElementById('expense_cut_pct').value = 0;
+      } else if (type === 'balanced') {
+        document.getElementById('income_change_pct').value = 0;
+        document.getElementById('expense_cut_pct').value = 0;
+        document.getElementById('extra_monthly_expense').value = 0;
+        document.getElementById('one_time_expense').value = 0;
+      }
+
+      // Sync all sliders to labels
+      ['savings_balance', 'baseline_monthly_expenses', 'monthly_income', 'income_change_pct', 'expense_cut_pct', 'extra_monthly_expense', 'one_time_expense', 'one_time_month'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.dispatchEvent(new Event('input'));
+      });
+
+      triggerSimulation();
+    }
+
+    function resetForm() {
+      applyPreset('balanced');
+    }
+  </script>
+</body>
+</html>

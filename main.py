@@ -1,6 +1,11 @@
-# pip install sqlalchemy
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 from fastapi import FastAPI, File, UploadFile, Request, Form, Depends
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse,FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from typing import List, Optional
 import shutil
@@ -26,13 +31,18 @@ from processing_history import (
     get_processing_batch,
     save_processing_batch,
 )
-load_dotenv() 
+load_dotenv()
 # Database Imports (SQLAlchemy)
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
-
 # Your custom imports (Make sure these files exist in your project)
-from expense_processing import load_all_expenses,save_expenses,format_manual_entry
+from expense_processing import (
+    load_all_expenses,
+    save_expenses,
+    format_manual_entry,
+    delete_user_expense,
+    update_user_expense,
+) 
 
 from report_utils import render_report_response
 from ocr_extraction import process_invoice 
@@ -45,6 +55,12 @@ from receipt_storage import (
     get_receipt_path,
     delete_receipt,
     ALLOWED_MIME_TYPES,
+)
+from processing_history import save_processing_batch
+from runway_simulator import (
+    compute_baseline_metrics,
+    simulate_runway,
+    generate_cfo_strategic_advisory,
 )
 
 app = FastAPI()
@@ -203,7 +219,7 @@ async def login(
     
     # Redirect to home and set secure HTTP-only cookie
     response = RedirectResponse(url="/", status_code=302)
-    response.set_cookie(key="access_token", value=token, httponly=True, max_age=43200) # 12 hours
+    response.set_cookie(key="access_token", value=token, httponly=True, max_age=43200, samesite="lax") # 12 hours
     return response
 
 @app.get("/logout")
@@ -328,6 +344,8 @@ async def generate_report(
                 original_filename=uploaded.filename,
                 request_id=request_id,
             )
+            # Map both unique disk filename and original upload filename
+            permanent_receipts[Path(temp_path).name] = receipt_record
             permanent_receipts[Path(uploaded.filename).name] = receipt_record
         except Exception as exc:
             print(f"⚠️ Receipt storage error: {exc}")
@@ -346,6 +364,7 @@ async def generate_report(
         if not result:
             continue
 
+        result["id"] = uuid.uuid4().hex[:12]
         result["request_id"] = request_id
         result["data_source"] = "ai_ocr"
         result["user_id"] = user
@@ -363,13 +382,250 @@ async def generate_report(
 
     # 7. Persist & Render
     save_expenses(all_extracted_data)
-    save_processing_batch(username=user, expenses=all_extracted_data, batch_id=request_id)
+    save_processing_batch(username=user, expenses=all_extracted_data)
 
     extracted_path = request_dir / "extracted.json"
     with open(extracted_path, "w", encoding="utf-8") as file:
         json.dump(all_extracted_data, file, indent=4, ensure_ascii=False)
 
-    return render_report_response(request, all_extracted_data)
+    all_user_expenses = load_all_expenses(user)
+    return render_report_response(request, all_user_expenses, current_batch=all_extracted_data)
+
+
+# ============================================================
+# LIVE STREAMING REPORT GENERATION (SSE PROGRESS HUD)
+# ============================================================
+
+@app.post("/api/generate-report-stream")
+async def generate_report_stream(
+    request: Request,
+    receipts: List[UploadFile] = File(...),
+    db: Session = Depends(get_db),
+):
+    """
+    Streams Server-Sent Events (SSE) detailing real-time extraction progress:
+    PaddleOCR text scan per receipt, Multi-LLM financial parsing, and final ledger save.
+    """
+    user = get_current_user(request, db)
+    if not user:
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+
+    request_id = uuid.uuid4().hex[:12]
+    safe_user = "".join(c for c in str(user) if c.isalnum() or c in ("_", "-"))
+    request_dir = TEMP_UPLOAD_DIR / safe_user / request_id
+    request_dir.mkdir(parents=True, exist_ok=True)
+
+    temp_paths = []
+    valid_uploaded_files = [r for r in receipts if r.filename]
+
+    for index, file in enumerate(valid_uploaded_files):
+        original_name = Path(file.filename).name
+        unique_name = f"{index}_{uuid.uuid4().hex[:8]}_{original_name}"
+        temp_file_path = request_dir / unique_name
+
+        with open(temp_file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        temp_paths.append(str(temp_file_path))
+
+    if not temp_paths:
+        return JSONResponse({"error": "No valid receipt files uploaded"}, status_code=400)
+
+    # Permanent Vault Storage
+    permanent_receipts = {}
+    for temp_path, uploaded in zip(temp_paths, valid_uploaded_files):
+        try:
+            receipt_record = save_receipt(
+                username=user,
+                source_path=temp_path,
+                original_filename=uploaded.filename,
+                request_id=request_id,
+            )
+            permanent_receipts[Path(temp_path).name] = receipt_record
+            permanent_receipts[Path(uploaded.filename).name] = receipt_record
+        except Exception as exc:
+            print(f"⚠️ Receipt vault storage error: {exc}")
+
+    event_queue: asyncio.Queue = asyncio.Queue()
+    main_loop = asyncio.get_running_loop()
+
+    def sync_progress_callback(event: dict):
+        main_loop.call_soon_threadsafe(event_queue.put_nowait, event)
+
+    from ocr_extraction import process_invoices
+
+    def run_ocr_pipeline():
+        try:
+            results = process_invoices(temp_paths, progress_callback=sync_progress_callback)
+            main_loop.call_soon_threadsafe(event_queue.put_nowait, {"_done": True, "results": results})
+        except Exception as exc:
+            main_loop.call_soon_threadsafe(event_queue.put_nowait, {"_error": str(exc)})
+
+    executor.submit(run_ocr_pipeline)
+
+    async def event_generator():
+        # Initial event informing client of total uploaded files
+        file_names = [Path(p).name for p in temp_paths]
+        yield f"data: {json.dumps({'step': 'init', 'total_files': len(temp_paths), 'files': file_names, 'percent': 5})}\n\n"
+
+        while True:
+            event = await event_queue.get()
+
+            if "_error" in event:
+                yield f"data: {json.dumps({'step': 'error', 'message': event['_error']})}\n\n"
+                break
+
+            if "_done" in event:
+                raw_results = event.get("results") or []
+                all_extracted_data = []
+
+                for result in raw_results:
+                    if not result:
+                        continue
+                    result["id"] = uuid.uuid4().hex[:12]
+                    result["request_id"] = request_id
+                    result["data_source"] = "ai_ocr"
+                    result["user_id"] = user
+
+                    if source_file := result.get("source_file"):
+                        source_filename = Path(source_file).name
+                        if receipt_record := permanent_receipts.get(source_filename):
+                            result["receipt_id"] = receipt_record["receipt_id"]
+                            result["receipt_original_filename"] = receipt_record["original_filename"]
+
+                    all_extracted_data.append(result)
+
+                if all_extracted_data:
+                    save_expenses(all_extracted_data)
+                    save_processing_batch(username=user, expenses=all_extracted_data)
+
+                    extracted_path = request_dir / "extracted.json"
+                    with open(extracted_path, "w", encoding="utf-8") as file:
+                        json.dump(all_extracted_data, file, indent=4, ensure_ascii=False)
+
+                yield f"data: {json.dumps({'step': 'finished', 'percent': 100, 'count': len(all_extracted_data), 'redirect_url': '/reports'})}\n\n"
+                break
+
+            yield f"data: {json.dumps(event)}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+# ============================================================
+# RUNWAY & WHAT-IF SCENARIO SIMULATOR (PERSONAL & ORG)
+# ============================================================
+
+@app.get("/simulator", response_class=HTMLResponse)
+async def runway_simulator_page(request: Request, db: Session = Depends(get_db)):
+    """Personal & Household Runway and What-If Scenario Simulator."""
+    user = get_current_user(request, db)
+    if not user:
+        return RedirectResponse(url="/auth", status_code=302)
+
+    expenses = load_all_expenses(user)
+    baseline = compute_baseline_metrics(expenses)
+
+    default_monthly_burn = baseline.get("monthly_burn", 30000.0)
+    default_savings = round(max(default_monthly_burn * 5.0, 150000.0), -3)
+    default_income = round(default_monthly_burn * 1.15, -3)
+
+    simulation = simulate_runway(
+        savings_balance=default_savings,
+        baseline_monthly_expenses=default_monthly_burn,
+        monthly_income=default_income,
+        income_change_pct=0.0,
+        expense_cut_pct=0.0,
+        extra_monthly_expense=0.0,
+        one_time_expense=0.0,
+        one_time_month=1,
+        horizon_months=24,
+    )
+
+    advisory_html = generate_cfo_strategic_advisory(baseline, simulation, client)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="simulator.html",
+        context={
+            "username": user,
+            "baseline": baseline,
+            "simulation": simulation,
+            "advisory_html": advisory_html,
+        },
+    )
+
+
+@app.post("/api/simulator/simulate")
+async def api_runway_simulate(request: Request, payload: dict = Body(...), db: Session = Depends(get_db)):
+    user = get_current_user(request, db)
+    if not user:
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
+
+    savings_balance = float(payload.get("savings_balance", 150000.0))
+    baseline_monthly_expenses = float(payload.get("baseline_monthly_expenses", 30000.0))
+    monthly_income = float(payload.get("monthly_income", 35000.0))
+    income_change_pct = float(payload.get("income_change_pct", 0.0))
+    expense_cut_pct = float(payload.get("expense_cut_pct", 0.0))
+    extra_monthly_expense = float(payload.get("extra_monthly_expense", 0.0))
+    one_time_expense = float(payload.get("one_time_expense", 0.0))
+    one_time_month = int(payload.get("one_time_month", 1))
+    horizon_months = int(payload.get("horizon_months", 24))
+
+    sim_result = simulate_runway(
+        savings_balance=savings_balance,
+        baseline_monthly_expenses=baseline_monthly_expenses,
+        monthly_income=monthly_income,
+        income_change_pct=income_change_pct,
+        expense_cut_pct=expense_cut_pct,
+        extra_monthly_expense=extra_monthly_expense,
+        one_time_expense=one_time_expense,
+        one_time_month=one_time_month,
+        horizon_months=horizon_months,
+    )
+    return sim_result
+
+
+@app.post("/api/simulator/advisory")
+async def api_runway_advisory(request: Request, payload: dict = Body(...), db: Session = Depends(get_db)):
+    user = get_current_user(request, db)
+    if not user:
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
+
+    expenses = load_all_expenses(user)
+    baseline = compute_baseline_metrics(expenses)
+
+    savings_balance = float(payload.get("savings_balance", 150000.0))
+    baseline_monthly_expenses = float(payload.get("baseline_monthly_expenses", baseline.get("monthly_burn", 30000.0)))
+    monthly_income = float(payload.get("monthly_income", 35000.0))
+    income_change_pct = float(payload.get("income_change_pct", 0.0))
+    expense_cut_pct = float(payload.get("expense_cut_pct", 0.0))
+    extra_monthly_expense = float(payload.get("extra_monthly_expense", 0.0))
+    one_time_expense = float(payload.get("one_time_expense", 0.0))
+    one_time_month = int(payload.get("one_time_month", 1))
+    horizon_months = int(payload.get("horizon_months", 24))
+
+    sim_result = simulate_runway(
+        savings_balance=savings_balance,
+        baseline_monthly_expenses=baseline_monthly_expenses,
+        monthly_income=monthly_income,
+        income_change_pct=income_change_pct,
+        expense_cut_pct=expense_cut_pct,
+        extra_monthly_expense=extra_monthly_expense,
+        one_time_expense=one_time_expense,
+        one_time_month=one_time_month,
+        horizon_months=horizon_months,
+    )
+
+    advisory_html = generate_cfo_strategic_advisory(baseline, sim_result, client)
+    return {"advisory_html": advisory_html}
 
 
 @app.get("/receipts", response_class=HTMLResponse)
@@ -521,50 +777,31 @@ async def remove_receipt(
 @app.post("/add-manual-expense", response_class=HTMLResponse)
 async def add_manual_expense(
     request: Request,
-    merchant_name: List[str] = Form(...),
-    expense_date: List[str] = Form(...),
-    grand_total: List[float] = Form(...),
-    category: List[str] = Form(...),
-    description: Optional[List[str]] = Form(None),
+    merchant_name: str = Form(...),
+    expense_date: str = Form(...),
+    grand_total: float = Form(...),
+    category: str = Form("General"),
+    description: Optional[str] = Form(None),
     db: Session = Depends(get_db)
 ):
-    """Receives multiple manual expense entries at once."""
+    """Receives human fallback form submission."""
     user = get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/auth", status_code=302)
 
-    descriptions = description or [""] * len(merchant_name)
-    manual_entries = []
+    manual_data = format_manual_entry(
+        merchant=merchant_name,
+        date=expense_date,
+        total=grand_total,
+        category=category,
+        description=description
+    )
+    manual_data["user_id"] = user
 
-    # Iterate through all submitted rows
-    for i in range(len(merchant_name)):
-        m = merchant_name[i].strip()
-        if not m:
-            continue
-
-        d = expense_date[i] if i < len(expense_date) else ""
-        t = grand_total[i] if i < len(grand_total) else 0.0
-        c = category[i] if i < len(category) else "General"
-        desc = descriptions[i] if i < len(descriptions) else None
-
-        entry = format_manual_entry(
-            merchant=m,
-            date=d,
-            total=t,
-            category=c,
-            description=desc
-        )
-        entry["user_id"] = user
-        manual_entries.append(entry)
-
-    if not manual_entries:
-        return RedirectResponse(url="/", status_code=303)
-
-    # Save to user expenses and archive into processing ledger
-    save_expenses(manual_entries)
-    save_processing_batch(username=user, expenses=manual_entries)
-
-    return render_report_response(request, manual_entries)
+    save_expenses([manual_data])
+    save_processing_batch(username=user, expenses=[manual_data])
+    all_user_expenses = load_all_expenses(user)
+    return render_report_response(request, all_user_expenses, current_batch=[manual_data])
 
 @app.post("/api/chat")
 async def chat_with_cfo(request: Request, payload: dict = Body(...), db: Session = Depends(get_db)):
@@ -584,16 +821,32 @@ async def chat_with_cfo(request: Request, payload: dict = Body(...), db: Session
     if not expenses:
         return {"reply": "Your ledger is currently empty. Add some expenses first!"}
 
-    df = pd.json_normalize(expenses)
-    
-    cols_to_keep = [
-        'document_metadata.invoice_date', 
-        'seller_details.platform_or_marketplace', 
-        'document_metadata.expense_category',
-        'financial_totals.grand_total'
-    ]
-    available_cols = [c for c in cols_to_keep if c in df.columns]
-    csv_context = df[available_cols].to_csv(index=False)
+    normalized_rows = []
+    for exp in expenses:
+        meta = exp.get("document_metadata", {})
+        seller = exp.get("seller_details", {})
+        merchant = exp.get("merchant_info", {})
+        totals = exp.get("financial_totals", {})
+
+        date_val = meta.get("invoice_date") or merchant.get("date") or "Unknown Date"
+        vendor_val = (
+            seller.get("vendor_name")
+            or merchant.get("name")
+            or seller.get("platform_or_marketplace")
+            or "Unknown Vendor"
+        )
+        cat_val = meta.get("expense_category") or exp.get("category") or "General"
+        amount_val = totals.get("grand_total", 0.0)
+
+        normalized_rows.append({
+            "Date": date_val,
+            "Vendor": vendor_val,
+            "Category": cat_val,
+            "Amount": amount_val,
+        })
+
+    df = pd.DataFrame(normalized_rows)
+    csv_context = df.to_csv(index=False)
 
     prompt = f"""
     You are an expert AI CFO analyzing financial data. 
@@ -615,7 +868,7 @@ async def chat_with_cfo(request: Request, payload: dict = Body(...), db: Session
 
     try:
         response = client.models.generate_content(
-            model='gemini-3.6-flash',
+            model='gemini-2.5-flash-lite',
             contents=prompt
         )
         return {"reply": response.text}
@@ -626,6 +879,7 @@ async def chat_with_cfo(request: Request, payload: dict = Body(...), db: Session
 async def upload_receipt(
     request: Request,
     file: UploadFile = File(...),
+    auto_process: Optional[str] = Form(None),
     db: Session = Depends(get_db),
 ):
     # 1. Get logged-in user
@@ -668,6 +922,32 @@ async def upload_receipt(
         )
 
         print(f"✅ Receipt uploaded by user {user}: {original_filename}")
+
+        # 7. Optional immediate OCR & expense extraction
+        if auto_process:
+            from ocr_extraction import process_invoices
+
+            loop = asyncio.get_running_loop()
+            extracted_raw = await loop.run_in_executor(
+                executor, process_invoices, [str(temp_path)]
+            )
+            extracted_data = []
+            for item in extracted_raw:
+                if not item:
+                    continue
+                item["id"] = uuid.uuid4().hex[:12]
+                item["request_id"] = receipt_record.get("request_id")
+                item["data_source"] = "ai_ocr"
+                item["user_id"] = user
+                item["receipt_id"] = receipt_record.get("receipt_id")
+                item["receipt_original_filename"] = receipt_record.get("original_filename")
+                extracted_data.append(item)
+
+            if extracted_data:
+                save_expenses(extracted_data)
+                save_processing_batch(username=user, expenses=extracted_data)
+                return RedirectResponse(url="/reports", status_code=303)
+
         return RedirectResponse(url="/receipts?uploaded=success", status_code=303)
 
     except Exception as exc:
@@ -675,9 +955,94 @@ async def upload_receipt(
         return RedirectResponse(url="/receipts?error=upload_failed", status_code=303)
 
     finally:
-        # 7. Clean up temporary file
+        # 8. Clean up temporary file
         try:
             if temp_path.exists():
                 temp_path.unlink()
         except OSError as exc:
             print(f"⚠️ Could not delete temporary file: {exc}")
+
+
+@app.post("/api/receipts/{receipt_id}/process")
+async def process_vault_receipt(
+    receipt_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """Trigger OCR and extract expenses from an existing receipt stored in the vault."""
+    user = get_current_user(request, db)
+    if not user:
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
+
+    receipt_path = get_receipt_path(user, receipt_id)
+    receipt_record = get_receipt(user, receipt_id)
+    if not receipt_path or not receipt_record:
+        return JSONResponse(status_code=404, content={"error": "Receipt not found"})
+
+    from ocr_extraction import process_invoices
+
+    loop = asyncio.get_running_loop()
+    extracted_raw = await loop.run_in_executor(
+        executor, process_invoices, [str(receipt_path)]
+    )
+
+    extracted_data = []
+    request_id = receipt_record.get("request_id") or uuid.uuid4().hex[:12]
+    for item in extracted_raw:
+        if not item:
+            continue
+        item["id"] = uuid.uuid4().hex[:12]
+        item["request_id"] = request_id
+        item["data_source"] = "ai_ocr"
+        item["user_id"] = user
+        item["receipt_id"] = receipt_id
+        item["receipt_original_filename"] = receipt_record.get("original_filename")
+        extracted_data.append(item)
+
+    if not extracted_data:
+        return JSONResponse(
+            status_code=422,
+            content={"error": "Could not extract structured financial data from this receipt."}
+        )
+
+    save_expenses(extracted_data)
+    save_processing_batch(username=user, expenses=extracted_data)
+
+    return {
+        "success": True,
+        "message": f"Successfully extracted and saved {len(extracted_data)} expense(s) to ledger.",
+        "count": len(extracted_data),
+    }
+
+
+@app.put("/api/expenses/{expense_id}")
+async def edit_expenses(
+    expense_id: str,
+    request: Request,
+    payload: dict = Body(...),
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(request, db)
+    if not user:
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
+    success = update_user_expense(user, expense_id, payload)
+    if not success:
+        return JSONResponse(status_code=404, content={"error": "Expense not found"})
+    return {"success": True, "message": "User expense updated successfully"}
+
+@app.delete("/api/expenses/{expense_id}")
+async def remove_expense(
+    expense_id: str,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    user = get_current_user(request, db)
+    if not user:
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
+
+    success = delete_user_expense(user, expense_id)
+    if not success:
+        return JSONResponse(status_code=404, content={"error": "Expense not found"})
+
+    return {"success": True, "message": "Expense deleted successfully"}
+

@@ -1,0 +1,99 @@
+{
+    "buyer_details": {
+        "billing_address": "Sri Smt Bhagyamma building, E1, 5th floor, 1st cross, Kaveri",
+        "customer_company": null,
+        "customer_name": "Sri Smt Bhagyamma building, E1, 5th floor, 1st cross, Kaveri",
+        "customer_type": "Unregistered",
+        "shipping_address": null,
+        "tax_id_gstin": null
+    },
+    "document_metadata": {
+        "billing_period_end": null,
+        "billing_period_start": null,
+        "currency_code": "INR",
+        "document_type": "Invoice",
+        "due_date": null,
+        "expense_category": "Clothing & Apparel",
+        "invoice_date": "2023-08-02",
+        "invoice_number": "I0624KO001873338",
+        "nature_of_transaction": "Inter-State",
+        "order_number": null,
+        "place_of_supply": "KARNATAKA",
+        "tracking_or_packet_id": "9431311286"
+    },
+    "financial_totals": {
+        "amount_paid": 8097,
+        "balance_due": 0,
+        "grand_total": 8097,
+        "gross_amount_pre_discount": 8097,
+        "other_charges": 0,
+        "shipping_and_handling_charges": 0,
+        "taxable_amount_subtotal": 7547,
+        "total_discount_amount": 0,
+        "total_tax_amount": 26.19
+    },
+    "line_items": [
+        {
+            "description": "Tokyo Talkies Women Blue Flared High-Rise Clean Look Jeans, Size: 30",
+            "discount_amount": 0,
+            "hsn_sac_code": "62046200",
+            "item_id_or_sku": "TOKYJENS45405176",
+            "quantity": 1,
+            "tax_amount": 26.19,
+            "tax_percentage": 5,
+            "taxable_value": 1349,
+            "total_item_amount": 1899,
+            "unit_price": 1899
+        },
+        {
+            "description": "BEC 3A XT60 Plug",
+            "discount_amount": 0,
+            "hsn_sac_code": null,
+            "item_id_or_sku": "BEC3AXT60",
+            "quantity": 1,
+            "tax_amount": 0,
+            "tax_percentage": 0,
+            "taxable_value": 6198,
+            "total_item_amount": 6198,
+            "unit_price": 6198
+        }
+    ],
+    "payment_details": {
+        "payment_date": null,
+        "payment_method": null,
+        "payment_transaction_id": null
+    },
+    "seller_details": {
+        "billing_address": "Reg Address: Konde Products & Services Private Limited,3rd floor, No. 1185,5th Main, 7th sector HSR layout., Obeya Tranquil, Bengaluru, Bengaluru Urban., Bengaluru, KARNATAKA-560102",
+        "contact_email": null,
+        "contact_phone": "+91 80 6156 1999",
+        "pan_or_company_id": null,
+        "platform_or_marketplace": "Myntra",
+        "shipping_address": null,
+        "tax_id_gstin": "06AAGCK4304E2ZY",
+        "vendor_name": "Konde Products & Services Private Limited"
+    },
+    "tax_breakdown": {
+        "cgst_amount": 0,
+        "igst_amount": 26.19,
+        "sales_tax_amount": 0,
+        "sgst_amount": 0,
+        "tax_cess_amount": 0,
+        "vat_amount": 0
+    },
+    "source_file": "0_f79d6ceb_receipt.jpg",
+    "raw_ocr_text_reference": "1,798.00\n9431311286\nInvoice Number: I0624KO001873338\nPacketID: 9431311286\nAPM 2.6/2.8 and\nInvoice Date: 02 Aug 2023\nNature of Transaction: Inter-State\nOrder Date: 02 Aug 2023\nPlace of Supply: KARNATAKA\nNature of Supply: Goods\nINVOICE\n1,598.00\n#16,17, Sri Smt Bhagyamma building, E1, 5th floor, 1st cross, Kaveri Customer Type: Unregistered\nPixhau 2.4.6/2.4.8\nBill From:\nShip From:\nABS Plastic Landing\nKonde Products & Services Private Limited\nWith Compass for\nat boy's hostel of\nHaryana, Bhiwadi, Haryana-122413\nHaryana, Bhiwadi, Haryana-122413\nGSTIN Number: 06AAGCK4304E2ZY\nGross\nOther\nTaxable\nCGST\nSGST/\nQty\nDiscount\nCharges\nIGST\nUGST\nCess Total Amount\nAmount\nAmount\nTOKYJENS45405176 - Tokyo Talkies Women Blue Flared High-Rise Clean Look Jeans, Size: 30\nHSN: 62046200, 5.0% IGST\n1\nRs 1899.00 Rs 1349.00\nRs 0.00\nPx : 18\nRs 26.19\nRs 550.00\nTOTAL\nRs 1899.00 Rs 1349.00\nRs 0.00\nRs 523.81\nRs 26.19\nRs 550.00\nBEC 3A XT60 Plug\n6,198.00\nDECLARATION\nThe goods sold as part of this shipment are intended for end-user consumption and are not for retail sale\nTb : 6-\nReg Address: Konde Products & Services Private Limited,3rd floor, No. 1185,5th Main, 7th sector HSR layout., Obeya\nTranquil, Bengaluru, Bengaluru Urban., Bengaluru, KARNATAKA-560102\nIf you have any questions, feel free to call customer care at +91 80 6156 1999 or use Contact Us section in our App,\nMyntra\nor log on to www.myntra.com/ contactus",
+    "validation": {
+        "status": "REVIEW_REQUIRED",
+        "line_items_count": 2,
+        "valid_line_items": 2,
+        "line_items_total": 8097.0,
+        "grand_total": 8097.0,
+        "line_items_difference": 0.0,
+        "accounting_total": 7573.19,
+        "accounting_difference": 523.81,
+        "tax_breakdown_total": 26.19,
+        "tax_difference": 0.0
+    },
+    "document_hash": "ecc169f7c8086bf3211a4a6e137a5cdf14cf3bfbbccc0b1ed0775190ef4eb4b0"
+}

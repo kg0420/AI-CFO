@@ -1,0 +1,147 @@
+{
+    "document_metadata": {
+        "document_type": "invoice",
+        "invoice_number": "F-17537",
+        "order_number": null,
+        "tracking_or_packet_id": null,
+        "invoice_date": "2026-02-17",
+        "due_date": null,
+        "billing_period_start": null,
+        "billing_period_end": null,
+        "place_of_supply": null,
+        "nature_of_transaction": null,
+        "expense_category": null,
+        "currency_code": "INR"
+    },
+    "seller_details": {
+        "vendor_name": "RIO KITCHEN & BAR",
+        "platform_or_marketplace": null,
+        "billing_address": "RIO KITCHEN & BAR\nOPPOSITE VIVANTA HOTEL,\nBESIDES THE SOCIAL STREET\nHINJEWADI-WAKAD ROAD.\nHINJEWADI, PUNE 411057",
+        "shipping_address": null,
+        "tax_id_gstin": "27ABEFR095BF1Z4",
+        "pan_or_company_id": null,
+        "contact_phone": null,
+        "contact_email": null
+    },
+    "buyer_details": {
+        "customer_name": null,
+        "customer_company": null,
+        "customer_type": null,
+        "billing_address": null,
+        "shipping_address": null,
+        "tax_id_gstin": null
+    },
+    "financial_totals": {
+        "gross_amount_pre_discount": 20090,
+        "total_discount_amount": null,
+        "taxable_amount_subtotal": 20090,
+        "total_tax_amount": 1004.5,
+        "shipping_and_handling_charges": null,
+        "other_charges": null,
+        "grand_total": 21095,
+        "amount_paid": null,
+        "balance_due": null
+    },
+    "tax_breakdown": {
+        "cgst_amount": 502.25,
+        "sgst_amount": 502.25,
+        "igst_amount": null,
+        "vat_amount": null,
+        "sales_tax_amount": null,
+        "tax_cess_amount": null
+    },
+    "payment_details": {
+        "payment_date": null,
+        "payment_method": null,
+        "payment_transaction_id": null
+    },
+    "line_items": [
+        {
+            "item_id_or_sku": null,
+            "description": "VEG PLATTERS",
+            "hsn_sac_code": null,
+            "quantity": 2,
+            "unit_price": 3099,
+            "discount_amount": null,
+            "taxable_value": 6198,
+            "tax_percentage": 5,
+            "tax_amount": 309.9,
+            "total_item_amount": 6508.9
+        },
+        {
+            "item_id_or_sku": null,
+            "description": "NON VEG PLATTER",
+            "hsn_sac_code": null,
+            "quantity": 2,
+            "unit_price": 4399,
+            "discount_amount": null,
+            "taxable_value": 8798,
+            "tax_percentage": 5,
+            "tax_amount": 439.9,
+            "total_item_amount": 9237.9
+        },
+        {
+            "item_id_or_sku": null,
+            "description": "AMRITSARI SOYA CHAP",
+            "hsn_sac_code": null,
+            "quantity": 1,
+            "unit_price": 899,
+            "discount_amount": null,
+            "taxable_value": 899,
+            "tax_percentage": 5,
+            "tax_amount": 44.95,
+            "total_item_amount": 943.95
+        },
+        {
+            "item_id_or_sku": null,
+            "description": "crispy corn",
+            "hsn_sac_code": null,
+            "quantity": 2,
+            "unit_price": 799,
+            "discount_amount": null,
+            "taxable_value": 1598,
+            "tax_percentage": 5,
+            "tax_amount": 79.9,
+            "total_item_amount": 1677.9
+        },
+        {
+            "item_id_or_sku": null,
+            "description": "HARA BHARA KABAB",
+            "hsn_sac_code": null,
+            "quantity": 1,
+            "unit_price": 799,
+            "discount_amount": null,
+            "taxable_value": 799,
+            "tax_percentage": 5,
+            "tax_amount": 39.95,
+            "total_item_amount": 838.95
+        },
+        {
+            "item_id_or_sku": null,
+            "description": "VEG SCHEZWAN RICE",
+            "hsn_sac_code": null,
+            "quantity": 2,
+            "unit_price": 899,
+            "discount_amount": null,
+            "taxable_value": 1798,
+            "tax_percentage": 5,
+            "tax_amount": 89.9,
+            "total_item_amount": 1887.9
+        }
+    ],
+    "source_file": "2_678d70f6_receipt3.jpeg",
+    "raw_ocr_text_reference": "RIO KITCHEN & BAR\nOPPOSITE VIVANTA HOTEL,\nBESIDES THE SOCIAL STREET\nHINJEWADI-WAKAD ROAD.\nHINJEWADI, PUNE 411057\nINVOICE\nNo : F-17537\nDt : 17-Feb-2026 00:10\nTb : 6-\nPx : 18\nWt : Ram\nOp : SANTOSH\nKOTs: 332970, 332971,\n332973, 332989, 332993\nDescription\nQty\nAmount\nVEG PLATTERS\n2\n6,198.00\nNON VEG PLATTER\n2\n8,798.00\nAMRITSARI SOYA CHAP\n1\n899.00\ncrispy corn\n2\n1,598.00\nHARA BHARA KABAB\n1\n799.00\nVEG SCHEZWAN RICE\n2\n1,798.00\nFood Taxable Total\n20,090.00\n2.5% SGST on Food Taxable\n502.25\n2.5% CGST on Food Taxable :\n502.25\nBill Total :\n21,095.00\nGST NO - 27ABEFR095BF1Z4\nVAT No - 27412061215V\nThank You !!",
+    "validation": {
+        "status": "REVIEW_REQUIRED",
+        "line_items_count": 6,
+        "valid_line_items": 6,
+        "line_items_total": 21095.5,
+        "grand_total": 21095.0,
+        "line_items_difference": -0.5,
+        "accounting_total": 21094.5,
+        "accounting_difference": 0.5,
+        "tax_breakdown_total": 1004.5,
+        "tax_difference": 0.0
+    },
+    "document_hash": "97c8bf59c0a243bd2d53a6e151af537017321a84ad6083a93e9330042a3bc9aa"
+}

@@ -1,0 +1,153 @@
+
+
+===== 0_6233ae15_receipt.jpg =====
+
+Tax Invoice
+9431311286
+InvoiceNumber:I0624KO001873338
+PacketID: 9431311286
+OrderNumber:1242843-0942048-8479201
+Invoice Date: 02Aug 2023
+Nature ofTransaction:Inter-State
+Order Date: 02 Aug2023
+PlaceofSupply:KARNATAKA
+Nature of Supply: Goods
+Billto/ Ship to:
+Chahat Verma
+#16,17,SriSmtBhagyamma building,E1,5th floor,1stcross,KaveriCustomerType:Unregistered
+layoutMarathahalliColonyBengaluru-560037KA,India
+Bill From:
+Ship From:
+Konde Products &Services Private Limited
+Konde Products &Services Private Limited
+Embassy Industrial Park,Village Pathredi,TaoruRoad,Gurgaon,
+EmbassyIndustrial Park,VillagePathredi,TaoruRoad,Gurgaon,
+Haryana,Bhiwadi, Haryana-122413
+Haryana, Bhiwadi, Haryana-122413
+GSTINNumber:06AAGCK4304E2ZY
+Gross
+Other
+Qty
+Discount
+Taxable
+CGST
+SGST/
+Charges
+IGST
+Cess Total Amount
+Amount
+Amount
+UGST
+TOKYJENS45405176- Tokyo Talkies Women Blue Flared High-Rise Clean Look Jeans, Size: 30
+HSN:62046200,5.0%IGST
+1
+Rs 1899.00 Rs 1349.00
+Rs0.00
+Rs523.81
+Rs 26.19
+Rs 550.00
+TOTAL
+Rs 1899.00
+Rs1349.00
+Rs0.00
+Rs 523.81
+Rs 26.19
+Rs 550.00
+Konde Products & Services Private Limited
+Authorized Signatory
+DECLARATION
+The goods sold as part ofthis shipment are intended forend-user consumption and are not for retail sale
+Purchase made on
+RegAddress:Konde Products&Services Private Limited,3rd Hoor, No.1185,5th Main,7th sector HSR layout,Obeya
+Tranquil,Bengaluru,BengaluruUrban,Bengaluru,KARNATAKA-560102
+M
+Ifyou have any questions, feel free to cal1customer care at+91806156 1999oruse Contact Ussectionin ourApp,
+Mynta
+or log on towww.myntra.com/contactus
+
+===== 1_bdbe9c2a_receipt2 - Copy.jpg =====
+
+Eh:+91 9606044623
+ironhillindia.com
+DATE:25-0623
+Bil1No:61849
+TIME:21.58
+Waiter:Guest
+Table :CB3
+Cover:1
+Guest:Nishant
+Items
+Qty
+Priae
+FOOD & BEVERAGES
+Corn Cheese Cigar R
+269.00
+1
+Murgh Tikka
+359.00
+1
+Roasted Chicken Bao
+299.00
+1
+Basil Veggie Dim Su
+249.00
+1
+Chicken Tikka Pizza
+1
+449.00
+Mac & Cheese-Veg
+1
+289.00
+Chicken Dum Biryari
+1
+349.00
+Brownie Shake
+2
+550.00
+Herb Roasted Veg Pi
+1
+399.00
+BIRD EYE CHILLI WIN
+1
+399.00
+Total
+3611.00
+LIQUOR
+Sincity Cider - Pit
+2
+1758.00
+Sanpler
+Wonderland
+1.
+45.00
+Sampler
+Sinoity Cid
+1
+45.00
+Sampler
+World Serie
+1
+45.00
+Sanpler
+Season Fina
+1
+45.00
+Sampler Red Ale ( A
+1
+45.00
+Total
+1983.00
+Total No. Items : 18
+Sub Total
+5594.00
+Central Gst@2.58
+90.32
+State Gst@2.58
+90.32
+Service Charge@108
+0.00
+Round Off
+0.36
+Total
+5775.00
+Seventy-Five

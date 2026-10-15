@@ -45,5 +45,5 @@ FINANCIAL_JSON_SCHEMA = load_json_file(FINANCIAL_SCHEMA_PATH)
 # APPLICATION SETTINGS
 # ============================================================
 GROQ_MODEL = "openai/gpt-oss-120b"
-MAX_GROQ_WORKERS = 2
+MAX_GROQ_WORKERS = 5
 MAX_IMAGE_WIDTH = 1200  

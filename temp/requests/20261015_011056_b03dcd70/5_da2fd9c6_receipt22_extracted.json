@@ -1,0 +1,87 @@
+{
+    "document_metadata": {
+        "document_type": "purchase_order",
+        "invoice_number": "1200000165",
+        "order_number": null,
+        "tracking_or_packet_id": null,
+        "invoice_date": "2026-05-27",
+        "due_date": null,
+        "billing_period_start": null,
+        "billing_period_end": null,
+        "place_of_supply": null,
+        "nature_of_transaction": null,
+        "expense_category": "Hardware",
+        "currency_code": "INR"
+    },
+    "seller_details": {
+        "vendor_name": "SAIEN WELDS PVT LTD",
+        "platform_or_marketplace": null,
+        "billing_address": "PUNE Plot-233, Sector-7, P.C.N.TD.A, Pune-411026, MH, IN",
+        "shipping_address": null,
+        "tax_id_gstin": "27AARCS2691H1ZS",
+        "pan_or_company_id": null,
+        "contact_phone": null,
+        "contact_email": "sales@saienweld.com"
+    },
+    "buyer_details": {
+        "customer_name": "Duroshox International Private Limited",
+        "customer_company": "Duroshox International Private Limited",
+        "customer_type": null,
+        "billing_address": null,
+        "shipping_address": "Gat No.1258/1259, Pune-Nagar Road, Sanaswadi, Taluka Shirur, Pune-412208, MH, IN",
+        "tax_id_gstin": "27AAICD4953A1ZT"
+    },
+    "financial_totals": {
+        "gross_amount_pre_discount": null,
+        "total_discount_amount": null,
+        "taxable_amount_subtotal": null,
+        "total_tax_amount": null,
+        "shipping_and_handling_charges": null,
+        "other_charges": null,
+        "grand_total": 938100.0,
+        "amount_paid": null,
+        "balance_due": null
+    },
+    "tax_breakdown": {
+        "cgst_amount": null,
+        "sgst_amount": null,
+        "igst_amount": null,
+        "vat_amount": null,
+        "sales_tax_amount": null,
+        "tax_cess_amount": null
+    },
+    "payment_details": {
+        "payment_method": null,
+        "payment_transaction_id": null,
+        "payment_date": null
+    },
+    "line_items": [
+        {
+            "item_id_or_sku": "90004138",
+            "description": "HYDRAULIC ROLL MARKING MACHINE",
+            "hsn_sac_code": "84798999",
+            "quantity": 1,
+            "unit_price": 795000.0,
+            "discount_amount": null,
+            "taxable_value": null,
+            "tax_percentage": null,
+            "tax_amount": null,
+            "total_item_amount": 938100.0
+        }
+    ],
+    "source_file": "5_da2fd9c6_receipt22.png",
+    "raw_ocr_text_reference": "Capital PO\nField\nExtracted Value\nDocument Type\nCapital PO\nVendor ID\n12000110\nVendor Name\nSAIEN WELDS PVT LTD\nVendor Address\nPUNE Plot-233, Sector-7, P.C.N.TD.A, Pune-411026, MH, IN\nVendor Phone\nNot clearly visible\nVendor GSTIN\n27AARCS2691H1ZS\nVendor Email\nsales@saienweld.com\nPurchase Order No.\n1200000165\nPO Date\n27-05-2026\nQuotation Ref No.\nNot available\nStorage Location\nBSR1\nDeliver To\nDuroshox International Private Limited\nDelivery Address\nGat No.1258/1259, Pune-Nagar Road, Sanaswadi, Taluka Shirur,\nPune-412208, MH, IN\nGSTIN (Buyer)\n27AAICD4953A1ZT\nPAN No.\nAAICD4953A\nItem Code\n90004138\nItem Description\nHYDRAULIC ROLL MARKING MACHINE\nHSN/SAC Code\n84798999\nAsset Number\n20000455\nQuantity\n1\nUOM\nEA\nRate (INR)\n7,95,000.00\nCGST %\n9.00\nSGST %\n9.00\nIGST %\n0.00\nDiscount %\n0.00\nAmount (INR)\n9.38,100.00\nTotal Amount\n9,38,100.00\nAmount in Words\nNINE LAKH THIRTY EIGHT THOUSAND ONE HUNDRED\nONLY\nPayment Terms\n30% Advance basic amount against PO, 60% against proforma\ninvoice before dispatch, Full GST payment against GST filing proof\nsubmission, 10% after I&C against 10% PBG valid for 1 year\nMode of Dispatch\nBy Road\nDelivery Date\n30-07-2026\nFreight\nInclude",
+    "validation": {
+        "status": "VALID",
+        "line_items_count": 1,
+        "valid_line_items": 1,
+        "line_items_total": 938100.0,
+        "grand_total": 938100.0,
+        "line_items_difference": 0.0,
+        "accounting_total": null,
+        "accounting_difference": null,
+        "tax_breakdown_total": 0.0,
+        "tax_difference": null
+    },
+    "document_hash": "9b0d639910a84741dfae46c3c6067ec7cecf72746d005c65fc13b49103a5c14d"
+}

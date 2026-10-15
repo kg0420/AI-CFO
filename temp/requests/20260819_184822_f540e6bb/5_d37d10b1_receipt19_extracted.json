@@ -1,0 +1,87 @@
+{
+    "document_metadata": {
+        "document_type": "Tax Invoice",
+        "invoice_number": "096650-2025",
+        "order_number": "315784",
+        "tracking_or_packet_id": null,
+        "invoice_date": "2025-03-24",
+        "due_date": null,
+        "billing_period_start": null,
+        "billing_period_end": null,
+        "place_of_supply": null,
+        "nature_of_transaction": null,
+        "expense_category": "Hardware",
+        "currency_code": "INR"
+    },
+    "seller_details": {
+        "vendor_name": "RoboticsDNA",
+        "platform_or_marketplace": null,
+        "billing_address": "Roboticsdna- Godown No. 1, Anant Industrial Estate, 1st Kaman, Dangat Patil Nagar, Shivane, Pune, Maharashtra 411023",
+        "shipping_address": null,
+        "tax_id_gstin": "27AWKPT6559P1ZA",
+        "pan_or_company_id": null,
+        "contact_phone": "+91 8329649598 / +91 7507177602",
+        "contact_email": "info@roboticsdna.in"
+    },
+    "buyer_details": {
+        "customer_name": "Krish Gupta",
+        "customer_company": "Bharati Vidyapeeth's College of Engineering",
+        "customer_type": null,
+        "billing_address": "Bharati Vidyapeeth's College of Engineering, Lavale Pune, Maharashtra 412115",
+        "shipping_address": "Bharati Vidyapeeth's College of Engineering, Lavale Pune, Maharashtra 412115",
+        "tax_id_gstin": null
+    },
+    "financial_totals": {
+        "gross_amount_pre_discount": 3600.0,
+        "total_discount_amount": 0.0,
+        "taxable_amount_subtotal": 3600.0,
+        "total_tax_amount": 648.0,
+        "shipping_and_handling_charges": 69.0,
+        "other_charges": 0.0,
+        "grand_total": 4329.42,
+        "amount_paid": 4329.42,
+        "balance_due": 0.0
+    },
+    "tax_breakdown": {
+        "cgst_amount": 324.0,
+        "sgst_amount": 324.0,
+        "igst_amount": 0.0,
+        "vat_amount": 0.0,
+        "sales_tax_amount": 0.0,
+        "tax_cess_amount": 0.0
+    },
+    "payment_details": {
+        "payment_date": null,
+        "payment_method": "Manual Bank Transfer",
+        "payment_transaction_id": null
+    },
+    "line_items": [
+        {
+            "item_id_or_sku": "JXCT Soil NPK RDNA-D135",
+            "description": "JXCT Soil NPK RDNA-D135",
+            "hsn_sac_code": "90278990",
+            "quantity": 1,
+            "unit_price": 3600.0,
+            "discount_amount": 0.0,
+            "taxable_value": 3600.0,
+            "tax_percentage": 18.0,
+            "tax_amount": 648.0,
+            "total_item_amount": 4248.0
+        }
+    ],
+    "source_file": "5_d37d10b1_receipt19.jpg",
+    "raw_ocr_text_reference": "Address: Roboticsdna- Godown No. 1, Anant Industrial Estate,\n口\n1st Kaman, Dangat Patil Nagar, Shivane, Pune, Maharashtra\n411023\nRoboticsDNA.in\nMobile: +91 8329649598/ +91 7507177602\nEmail: info@roboticsdna.in\nTax Invoice\nGSTIN:27AWKPT6559P1ZA\nInvoice #: 096650-2025\nBill to:\nShip to:\nInvoice Date: March 24, 2025\nBharati Vidyapeeth's College of\nBharati Vidyapeeth's\nOrder Date: March 24, 2025\nEngineering Lavale Pune\nCollege of Engineering\nOrder Number: 315784\nKrish Gupta\nLavale Pune\nPayment Method: Manual Bank Transfer\nat boy's hostel of bharati\nKrish Gupta\nShipping Method: Surface Shipping (4 to 7 Working Days)\nvidyapeeth college of engineering\nat boy's hostel of\nlavale pune\nbharati vidyapeeth\npune 412115\ncollege of engineering\nMaharashtra\nlavale pune\nPhone:+917219570360\npune 412115\nMaharashtra\nS.No.\nDescription\nSKU\nHSN\nUnit Price\nQty\nAmount\nSGST\nCGST\nAmount\n1\nJXCT Soil NPK RDNA-D135\n90278990\n3,600.00\n1\n3,600.00\n324.00\n324.00\n₹4,248.00\nSensor 5V\n(9%)\n(9%)\nRS485\nSubtotal:\n€3,600.00\nShipping:\n€69.00\nCGST:\n330.21\nSGST:\n330.21\nTotal:\n€4,329.42\nAmount in Words :FOUR THOUSAND, THREE HUNDRED, TWENTY-NINE RUPEES,\nFORTY-TWO PAISE ONLY\n1 of 1",
+    "validation": {
+        "status": "REVIEW_REQUIRED",
+        "line_items_count": 1,
+        "valid_line_items": 1,
+        "line_items_total": 4248.0,
+        "grand_total": 4329.42,
+        "line_items_difference": 81.42,
+        "accounting_total": 4317.0,
+        "accounting_difference": 12.42,
+        "tax_breakdown_total": 648.0,
+        "tax_difference": 0.0
+    },
+    "document_hash": "cbb4b982226db943699a75142d1c8e718deb2973b268dd3f2136d4e180160021"
+}

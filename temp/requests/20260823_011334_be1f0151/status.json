@@ -1,0 +1,4 @@
+{
+    "status": "FAILED",
+    "message": "OCR completed but Groq extraction failed."
+}

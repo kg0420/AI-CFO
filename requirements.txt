@@ -6,6 +6,8 @@ jinja2
 sqlalchemy
 pandas
 plotly
+pillow
+numpy
 
 PyJWT
 bcrypt

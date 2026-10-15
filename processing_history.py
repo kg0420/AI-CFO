@@ -12,10 +12,12 @@ USERS_ROOT = DATA_ROOT / "users"
 
 def sanitize_username(username: str) -> str:
     """Make username safe to use as a directory name."""
+    if not username:
+        return "unknown_user"
     return "".join(
-        c if c.isalnum() or c in ("-", "_", ".") else "_"
+        c if c.isalnum() or c in ("-", "_") else "_"
         for c in str(username)
-    )
+    ) or "unknown_user"
 
 
 def get_user_directory(username: str) -> Path:
@@ -40,7 +42,7 @@ def load_processing_history(username: str) -> list:
         return []
 
 
-def save_processing_batch(username: str, expenses: list, batch_id: Optional[str] = None) -> dict:
+def save_processing_batch(username: str, expenses: list) -> dict:
     """Store one invoice-processing session."""
     history = load_processing_history(username)
     total_amount = 0.0
@@ -53,9 +55,9 @@ def save_processing_batch(username: str, expenses: list, batch_id: Optional[str]
             pass
 
     batch = {
-        "batch_id": batch_id or uuid.uuid4().hex,
+        "batch_id": uuid.uuid4().hex,
         "user_id": username,
-        "processed_at": datetime.now(timezone.utc).strftime("%d %b %Y, %H:%M UTC"),
+        "processed_at": datetime.now(timezone.utc).isoformat(),
         "invoice_count": len(expenses),
         "total_amount": round(total_amount, 2),
         "expenses": expenses,
@@ -67,6 +69,7 @@ def save_processing_batch(username: str, expenses: list, batch_id: Optional[str]
         encoding="utf-8",
     )
     return batch
+
 
 def get_processing_batch(username: str, batch_id: str) -> Optional[dict]:
     """Get a single processing session."""

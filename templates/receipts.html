@@ -19,13 +19,6 @@
       --stamp: #A5382B;
       --brass: #A9822F;
       --forest: #20402F;
-      --shadow: rgba(32, 48, 31, 0.18);
-      --ink-soft: #57644F;
-      --ink-faint: #8B9682;
-      --line-soft: #D8DECB;
-      --mint: #5F7A5A;
-      --paper-card: #FBFAF2;
-      --focus: #A9822F;
     }
 
     * { box-sizing: border-box; }
@@ -57,118 +50,6 @@
       padding-bottom: 22px;
       margin-bottom: 28px;
     }
-    /* ============================================================
-       NAVBAR
-       ============================================================ */
-    .navbar {
-      position: sticky;
-      top: 16px;
-      z-index: 100;
-      width: min(1120px, calc(100% - 32px));
-      margin: 16px auto 0;
-      min-height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 10px 12px 10px 16px;
-      background: rgba(251, 250, 242, 0.96);
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      box-shadow: 0 12px 32px -20px var(--shadow);
-      backdrop-filter: blur(10px);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      color: var(--ink);
-      text-decoration: none;
-      flex-shrink: 0;
-    }
-
-    .brand-mark {
-      width: 38px;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--forest);
-      color: #F3F1E3;
-      border-radius: 4px;
-      font-family: 'Spectral', serif;
-      font-size: 20px;
-      font-weight: 700;
-      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
-    }
-
-    .brand-copy { display: flex; flex-direction: column; justify-content: center; }
-    .brand-name { font-family: 'Spectral', serif; font-size: 21px; font-weight: 700; line-height: 1; letter-spacing: -0.01em; }
-    .brand-tagline { margin-top: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 8px; letter-spacing: .13em; text-transform: uppercase; color: var(--ink-faint); }
-
-    .nav-links { display: flex; align-items: center; gap: 3px; }
-    .nav-link {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 13px;
-      border-radius: 4px;
-      color: var(--ink-soft);
-      text-decoration: none;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: .045em;
-      text-transform: uppercase;
-      transition: color .2s ease, background .2s ease;
-    }
-
-    .nav-link:hover { color: var(--ink); background: var(--paper); }
-    .nav-link.active { color: var(--stamp); background: #F3EFE3; }
-    .nav-link.active::after {
-      content: "";
-      position: absolute;
-      left: 13px;
-      right: 13px;
-      bottom: 4px;
-      height: 1px;
-      background: var(--stamp);
-      opacity: .7;
-    }
-
-    .nav-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 15px; line-height: 1; }
-    .nav-status {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding-left: 10px;
-      margin-left: 5px;
-      border-left: 1px solid var(--line-soft);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 9px;
-      color: var(--ink-faint);
-      white-space: nowrap;
-    }
-
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 3px rgba(95, 122, 90, 0.10); }
-    .nav-toggle {
-      display: none;
-      width: 40px;
-      height: 38px;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      background: var(--paper);
-      color: var(--ink);
-      cursor: pointer;
-      font-size: 19px;
-    }
-    .nav-toggle:hover { background: var(--line-soft); }
-    .nav-toggle:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-
 
     .eyebrow {
       font: 11px 'IBM Plex Mono';
@@ -279,6 +160,34 @@
     }
 
     .buttons button.delete { color: var(--stamp); }
+    .buttons button.process {
+      background: var(--forest);
+      color: #FBFAF2;
+      border-color: var(--forest);
+      font-weight: 700;
+    }
+    .buttons button.process:hover:not(:disabled) {
+      background: #152B20;
+    }
+    .buttons button.process:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .auto-process-wrap {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--soft);
+      cursor: pointer;
+    }
+    .auto-process-wrap input {
+      accent-color: var(--forest);
+      cursor: pointer;
+    }
 
     .empty {
       text-align: center;
@@ -288,7 +197,10 @@
       color: var(--soft);
     }
 
-    
+    @media (max-width: 600px) {
+      .count { width: 100%; margin-left: 0; }
+      .thumb { height: 190px; }
+    }
     /* ============================================================
    UPLOAD CARD & HEADER
    ============================================================ */
@@ -447,116 +359,19 @@
     font-size: 10px;
     color: var(--soft);
     }
-    /* ============================================================
-       RESPONSIVE
-       ============================================================ */
-    @media (max-width: 800px) {
-      .navbar { top: 10px; margin-top: 10px; }
-      .nav-status { display: none; }
-      .nav-toggle { display: flex; }
-      .nav-links {
-        display: none;
-        position: absolute;
-        top: calc(100% + 8px);
-        left: 0; right: 0;
-        padding: 8px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 3px;
-        background: var(--paper-card);
-        border: 1px solid var(--line);
-        border-radius: 5px;
-        box-shadow: 0 18px 35px -18px var(--shadow);
-      }
-      .nav-links.open { display: flex; }
-      .nav-link { padding: 12px 13px; }
-      .nav-link.active::after { display: none; }
-      main { padding-top: 42px; }
-    }
-
-    @media (max-width: 600px) {
-      .container { width: min(100% - 24px, 620px); }
-      .navbar { width: calc(100% - 24px); min-height: 62px; padding: 9px 10px 9px 12px; }
-      .brand-mark { width: 35px; height: 35px; font-size: 18px; }
-      .brand-name { font-size: 19px; }
-      .brand-tagline { display: none; }
-      main { padding: 36px 0 60px; }
-      .page-header { margin-bottom: 22px; }
-      .page-header h1 { font-size: 34px; }
-      .page-description { font-size: 13px; padding: 0 8px; }
-      .card { padding: 32px 22px 25px; }
-      .stamp { width: 68px; height: 68px; right: 12px; top: -22px; font-size: 7px; }
-      .tabs { padding: 0 5px; }
-      .tab { padding: 10px 14px 13px; font-size: 9.5px; }
-      .grid2, .info-strip { grid-template-columns: 1fr; gap: 0; }
-      .info-item { display: flex; align-items: center; justify-content: space-between; text-align: left; padding: 10px 4px; }
-      .info-label { margin: 0; }
-    }
-
-    @media (max-width: 400px) {
-      .brand-copy { display: none; }
-      .navbar { justify-content: space-between; }
-      .page-header h1 { font-size: 30px; }
-      .card { padding: 30px 18px 23px; }
-      .dropzone { min-height: 165px; padding: 24px 12px; }
-      .tab { padding: 9px 11px 12px; font-size: 8.5px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-        scroll-behavior: auto !important;
-      }
-    @media (max-width: 600px) {
-    .count { width: 100%; margin-left: 0; }
-    .thumb { height: 190px; }
-    }
   </style>
 </head>
 <body>
 <div class="sheet">
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <a href="/" class="brand" aria-label="aiCFO Dashboard">
-      <div class="brand-mark">C</div>
-      <div class="brand-copy">
-        <div class="brand-name">aiCFO</div>
-        <div class="brand-tagline">Intelligent Finance</div>
-      </div>
-    </a>
-
-    <div class="nav-links" id="navLinks">
-      <a href="/" class="nav-link active">
-        <span class="nav-icon">⌂</span> Dashboard
-      </a>
-      <a href="/auth" class="nav-link">
-        <span class="nav-icon">▤</span> Login / Register
-      </a>
-      <a href="/receipts" class="nav-link">
-        <span class="nav-icon">▣</span> Receipt Vault
-      </a>
-      <a href="/ledger" class="nav-link">
-      <span class="nav-icon">▤</span> Ledger
-      </a>
-      <div class="nav-status">
-        <span class="status-dot"></span> Secure
-      </div>
-      
-    </div>
-
-    <button type="button" class="nav-toggle" id="navToggle" aria-label="Open navigation" aria-expanded="false">
-      ☰
-    </button>
-  </nav>
-
   <div class="head">
     <div>
       <div class="eyebrow">aiCFO · Document Storage</div>
       <h1>Receipt Vault</h1>
       <div class="meta">Your original receipts, safely stored with your account.</div>
     </div>
-    <div class="actions">
+    <div class="actions" style="display: flex; gap: 8px;">
+      <a class="btn" href="/simulator" style="background: var(--forest); color: #FBFAF2; border-color: var(--forest);">⚡ Runway Simulator</a>
+      <a class="btn" href="/reports">📊 Reports</a>
       <a class="btn" href="/">← Dashboard</a>
     </div>
   </div>
@@ -601,6 +416,10 @@
     </label>
 
     <div id="file-info" class="file-info"></div>
+    <label class="auto-process-wrap">
+      <input type="checkbox" name="auto_process" id="autoProcessCheck" value="1" checked>
+      <span>Also extract financial data to ledger (AI OCR)</span>
+    </label>
     <button type="submit" class="btn-submit" id="submitBtn" disabled>Save to Receipt Vault</button>
     <div id="status" class="upload-status"></div>
   </form>
@@ -669,6 +488,7 @@ function render() {
         <div class="date">Stored ${formatDate(r.uploaded_at)}</div>
         <div class="size">${formatSize(r.size_bytes)}</div>
         <div class="buttons">
+          <button class="process" onclick="processReceipt('${r.receipt_id}', this)" title="Extract financial data into ledger">Extract</button>
           <a href="/receipts/${encodeURIComponent(r.receipt_id)}" target="_blank" rel="noopener">View</a>
           <a href="/receipts/${encodeURIComponent(r.receipt_id)}/download">Download</a>
           <button class="delete" onclick="removeReceipt('${r.receipt_id}')">Delete</button>
@@ -710,7 +530,7 @@ function selectFile(file) {
     return;
   }
 
-  selectedFile = file; 
+  selectedFile = file;
   fileInfo.innerHTML = `<strong>${escapeHtml(file.name)}</strong> · ${formatSize(file.size)}`;
   fileInfo.classList.add('show');
   status.textContent = '';
@@ -780,6 +600,34 @@ async function loadReceipts() {
   }
 }
 
+async function processReceipt(id, btn) {
+  const origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Extracting...';
+  try {
+    const res = await fetch(`/api/receipts/${encodeURIComponent(id)}/process`, {
+      method: 'POST'
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      btn.textContent = '✓ Extracted';
+      btn.style.background = '#2E7D32';
+      btn.style.borderColor = '#2E7D32';
+      if (confirm('Receipt processed successfully and added to ledger! Would you like to view the Financial Report now?')) {
+        window.location.href = '/reports';
+      }
+    } else {
+      alert('Extraction failed: ' + (data.error || 'Unknown error'));
+      btn.disabled = false;
+      btn.textContent = origText;
+    }
+  } catch (err) {
+    alert('Server error while processing receipt.');
+    btn.disabled = false;
+    btn.textContent = origText;
+  }
+}
+
 async function removeReceipt(id) {
   if (!confirm('Delete this stored receipt? This removes the saved copy from your Receipt Vault.')) return;
   try {
@@ -794,20 +642,7 @@ async function removeReceipt(id) {
     alert('Something went wrong.');
   }
 }
-const navToggle = document.getElementById('navToggle');
-const navLinks = document.getElementById('navLinks');
 
-navToggle.addEventListener('click', function () {
-    navLinks.classList.toggle('open');
-
-    const isOpen = navLinks.classList.contains('open');
-
-    navToggle.setAttribute('aria-expanded', isOpen);
-    navToggle.setAttribute(
-        'aria-label',
-        isOpen ? 'Close navigation' : 'Open navigation'
-    );
-});
 document.getElementById('search').addEventListener('input', render);
 document.getElementById('sort').addEventListener('change', render);
 loadReceipts();

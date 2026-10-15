@@ -1,0 +1,94 @@
+
+
+===== 1_96df7e68_receipt2 - Copy.jpg =====
+
+Ph: +91 9606044623
+india.com
+DATE : 25-06-23
+BillNo: 61849
+TIME : 21.58
+Waiter:Guest
+Table :CB3
+Cover:1
+Guest :
+Nishant
+Items
+Price
+Qty
+FOOD & BEVERAGES
+Corn Cheese Cigar R
+269.00
+1
+Murgh Tikka
+359.00
+Roasted Chicken Bao
+1
+299.00
+Basil Veggie Dim Su
+1
+249.00
+Chicken Tikka Pizza
+1
+1
+449.00
+Mac & Cheese-Veg
+1
+289.00
+Chicken Dum Biryani
+1
+349.00
+Brownie Shake
+2
+550.00
+Herb Roasted Veg Pi
+1
+399.00
+BIRD EYE CHILLI WIN
+1
+399.00
+Total
+3611.00
+LIQUOR
+Sincity Cider - Pit
+2
+1758.00
+Sampler
+Wonderland
+1
+45.00
+Sampler
+Sincity Cid
+1
+45.00
+Sampler
+World Serie
+1
+45.00
+Sampler
+Season Fina
+1
+45.00
+Sampler
+Red Ale ( A
+1
+45.00
+Total
+1983.00
+Total
+No.
+Items : 18
+Sub Total
+5594.00
+Central Gst@2.58
+90.32
+State Gst@2.5%
+90.32
+Service Charge@10%
+0.00
+Round Off
+0.36
+5775.00
+Total
+Five Thousand
+Seventy-Five
+29AAECH7688G1ZZ

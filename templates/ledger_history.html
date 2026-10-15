@@ -686,9 +686,13 @@
                 <span class="nav-icon">⌂</span>
                 Dashboard
             </a>
-            <a href="/auth" class="nav-link">
-                <span class="nav-icon">▤</span>
-                Login / Register
+            <a href="/simulator" class="nav-link">
+                <span class="nav-icon">⚡</span>
+                Runway Simulator
+            </a>
+            <a href="/reports" class="nav-link">
+                <span class="nav-icon">📊</span>
+                Reports
             </a>
             <a href="/receipts" class="nav-link">
                 <span class="nav-icon">▣</span>
@@ -697,6 +701,10 @@
             <a href="/ledger" class="nav-link active">
                 <span class="nav-icon">▤</span>
                 Ledger
+            </a>
+            <a href="/logout" class="nav-link" style="color: var(--stamp);">
+                <span class="nav-icon">↪</span>
+                Logout
             </a>
             <div class="nav-status">
                 <span class="status-dot"></span>
@@ -766,7 +774,7 @@
                                     <div class="history-icon">🧾</div>
                                     <div class="history-info">
                                         <h3 class="history-title">Invoice Processing #{{ loop.index }}</h3>
-                                        <p class="history-date">{{ batch.processed_at }}</p>
+                                        <p class="history-date">{{ batch.processed_at[:16].replace('T', ' ') if batch.processed_at else 'Recent' }} UTC</p>
                                     </div>
                                 </div>
 

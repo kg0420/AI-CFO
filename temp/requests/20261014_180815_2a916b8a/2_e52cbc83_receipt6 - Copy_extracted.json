@@ -1,0 +1,87 @@
+{
+    "document_metadata": {
+        "document_type": "tax_invoice",
+        "invoice_number": "I0624KO001873338",
+        "order_number": "1242843-0942048-8479201",
+        "tracking_or_packet_id": "9431311286",
+        "invoice_date": "2023-08-02",
+        "due_date": null,
+        "billing_period_start": null,
+        "billing_period_end": null,
+        "place_of_supply": "KARNATAKA",
+        "nature_of_transaction": "Inter-State",
+        "expense_category": "Clothing & Apparel",
+        "currency_code": "INR"
+    },
+    "seller_details": {
+        "vendor_name": "Konde Products &Services Private Limited",
+        "platform_or_marketplace": "Myntra",
+        "billing_address": "Embassy Industrial Park,Village Pathredi,TaoruRoad,Gurgaon, Haryana,Bhiwadi, Haryana-122413",
+        "shipping_address": "EmbassyIndustrial Park,VillagePathredi,TaoruRoad,Gurgaon, Haryana, Bhiwadi, Haryana-122413",
+        "tax_id_gstin": "06AAGCK4304E2ZY",
+        "pan_or_company_id": null,
+        "contact_phone": "+918061561999",
+        "contact_email": null
+    },
+    "buyer_details": {
+        "customer_name": "Chahat Verma",
+        "customer_company": null,
+        "customer_type": "Unregistered",
+        "billing_address": "#16,17,SriSmtBhagyamma building,E1,5th floor,1stcross,Kaveri layoutMarathahalliColonyBengaluru-560037KA,India",
+        "shipping_address": "#16,17,SriSmtBhagyamma building,E1,5th floor,1stcross,Kaveri layoutMarathahalliColonyBengaluru-560037KA,India",
+        "tax_id_gstin": null
+    },
+    "financial_totals": {
+        "gross_amount_pre_discount": 1899.0,
+        "total_discount_amount": 1349.0,
+        "taxable_amount_subtotal": 523.81,
+        "total_tax_amount": 26.19,
+        "shipping_and_handling_charges": null,
+        "other_charges": null,
+        "grand_total": 550.0,
+        "amount_paid": null,
+        "balance_due": null
+    },
+    "tax_breakdown": {
+        "cgst_amount": 0.0,
+        "sgst_amount": 0.0,
+        "igst_amount": 26.19,
+        "vat_amount": null,
+        "sales_tax_amount": null,
+        "tax_cess_amount": null
+    },
+    "payment_details": {
+        "payment_method": null,
+        "payment_transaction_id": null,
+        "payment_date": null
+    },
+    "line_items": [
+        {
+            "item_id_or_sku": "TOKYJENS45405176",
+            "description": "Tokyo Talkies Women Blue Flared High-Rise Clean Look Jeans, Size: 30",
+            "hsn_sac_code": "62046200",
+            "quantity": 1,
+            "unit_price": 1899.0,
+            "discount_amount": 1349.0,
+            "taxable_value": 523.81,
+            "tax_percentage": 5.0,
+            "tax_amount": 26.19,
+            "total_item_amount": 550.0
+        }
+    ],
+    "source_file": "2_e52cbc83_receipt6 - Copy.jpeg",
+    "raw_ocr_text_reference": "Tax Invoice\n9431311286\nInvoiceNumber:I0624KO001873338\nPacketID: 9431311286\nOrderNumber:1242843-0942048-8479201\nInvoice Date: 02Aug 2023\nNature ofTransaction:Inter-State\nOrder Date: 02 Aug2023\nPlaceofSupply:KARNATAKA\nNature of Supply: Goods\nBillto/ Ship to:\nChahat Verma\n#16,17,SriSmtBhagyamma building,E1,5th floor,1stcross,KaveriCustomerType:Unregistered\nlayoutMarathahalliColonyBengaluru-560037KA,India\nBill From:\nShip From:\nKonde Products &Services Private Limited\nKonde Products &Services Private Limited\nEmbassy Industrial Park,Village Pathredi,TaoruRoad,Gurgaon,\nEmbassyIndustrial Park,VillagePathredi,TaoruRoad,Gurgaon,\nHaryana,Bhiwadi, Haryana-122413\nHaryana, Bhiwadi, Haryana-122413\nGSTINNumber:06AAGCK4304E2ZY\nGross\nOther\nQty\nDiscount\nTaxable\nCGST\nSGST/\nCharges\nIGST\nCess Total Amount\nAmount\nAmount\nUGST\nTOKYJENS45405176- Tokyo Talkies Women Blue Flared High-Rise Clean Look Jeans, Size: 30\nHSN:62046200,5.0%IGST\n1\nRs 1899.00 Rs 1349.00\nRs0.00\nRs523.81\nRs 26.19\nRs 550.00\nTOTAL\nRs 1899.00\nRs1349.00\nRs0.00\nRs 523.81\nRs 26.19\nRs 550.00\nKonde Products & Services Private Limited\nAuthorized Signatory\nDECLARATION\nThe goods sold as part ofthis shipment are intended forend-user consumption and are not for retail sale\nPurchase made on\nRegAddress:Konde Products&Services Private Limited,3rd Hoor, No.1185,5th Main,7th sector HSR layout,Obeya\nTranquil,Bengaluru,BengaluruUrban,Bengaluru,KARNATAKA-560102\nM\nIfyou have any questions, feel free to cal1customer care at+91806156 1999oruse Contact Ussectionin ourApp,\nMynta\nor log on towww.myntra.com/contactus",
+    "validation": {
+        "status": "VALID",
+        "line_items_count": 1,
+        "valid_line_items": 1,
+        "line_items_total": 550.0,
+        "grand_total": 550.0,
+        "line_items_difference": 0.0,
+        "accounting_total": 550.0,
+        "accounting_difference": 0.0,
+        "tax_breakdown_total": 26.19,
+        "tax_difference": 0.0
+    },
+    "document_hash": "054023d5be2e87ffa3fbef3a13c4f5ca398f2d4ddb6c156c1a50db4f98256d66"
+}

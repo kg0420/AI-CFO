@@ -1,0 +1,74 @@
+{
+    "document_metadata": {
+        "document_type": "invoice",
+        "invoice_number": null,
+        "order_number": null,
+        "tracking_or_packet_id": "9",
+        "invoice_date": null,
+        "due_date": null,
+        "billing_period_start": null,
+        "billing_period_end": null,
+        "place_of_supply": "ARNATAKA",
+        "nature_of_transaction": "Inter-State",
+        "expense_category": "Miscellaneous",
+        "currency_code": "INR"
+    },
+    "seller_details": {
+        "vendor_name": null,
+        "platform_or_marketplace": null,
+        "billing_address": null,
+        "shipping_address": null,
+        "tax_id_gstin": null,
+        "pan_or_company_id": null,
+        "contact_phone": null,
+        "contact_email": null
+    },
+    "buyer_details": {
+        "customer_name": "Ue Private Limited",
+        "customer_company": null,
+        "customer_type": null,
+        "billing_address": null,
+        "shipping_address": null,
+        "tax_id_gstin": null
+    },
+    "financial_totals": {
+        "gross_amount_pre_discount": null,
+        "total_discount_amount": null,
+        "taxable_amount_subtotal": null,
+        "total_tax_amount": null,
+        "shipping_and_handling_charges": null,
+        "other_charges": null,
+        "grand_total": null,
+        "amount_paid": null,
+        "balance_due": null
+    },
+    "tax_breakdown": {
+        "cgst_amount": null,
+        "sgst_amount": null,
+        "igst_amount": null,
+        "vat_amount": null,
+        "sales_tax_amount": null,
+        "tax_cess_amount": null
+    },
+    "payment_details": {
+        "payment_method": null,
+        "payment_transaction_id": null,
+        "payment_date": null
+    },
+    "line_items": [],
+    "source_file": "0_a38bd993_receipt.jpg",
+    "raw_ocr_text_reference": "o\n___ _\nce\n1\n94\n60460001873338\n2400010042-8470201\nPacketID: 9\n242843-0942048-8479201\nInvoice Date: 02\nion: Inter-State\nOrder Date: 02\nARNATAKA\nNature of Supp\n一\n_Ko\n,\nyamma building, E1, 5th floor, 1st.rss,ve\niste\nColony Bengaluru - 500054 talye\nKonde\nos\no\nark s PaivaPathredi,Taoru Road, Gurgaon,Embassy\nVill\ndi ,Taoru Road, Gu\n6AAGCK4304E\ntDiscoun\n5176 - Tokyo Talkies Women Blue Flared Hig\nLo\nas, Size: 30\n5.0% IGST\n9.00Rs 1349.00\nRs 0.00 Rs 523.81\n29.00. Rs-1349.00\nPa0.00 Po523.61\n一\n79.00 Rs 1549:00\n一\nSototns\nthis shipment are intended f\nPurchas\niied for end-user consumpt\nPurchan\nUePrivae Limited,3rd loo,N.\nUO",
+    "validation": {
+        "status": "UNKNOWN",
+        "line_items_count": 0,
+        "valid_line_items": 0,
+        "line_items_total": 0.0,
+        "grand_total": null,
+        "line_items_difference": null,
+        "accounting_total": null,
+        "accounting_difference": null,
+        "tax_breakdown_total": 0.0,
+        "tax_difference": null
+    },
+    "document_hash": "ecc169f7c8086bf3211a4a6e137a5cdf14cf3bfbbccc0b1ed0775190ef4eb4b0"
+}

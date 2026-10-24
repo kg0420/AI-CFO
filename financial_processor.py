@@ -463,6 +463,83 @@ def parse_with_groq(
     )
 
 
+def parse_image_with_gemini_vision(
+    filename,
+    image,
+    system_prompt=DEFAULT_SYSTEM_PROMPT,
+):
+    """
+    Direct multimodal vision extraction using Gemini.
+    Bypasses CPU-heavy local OCR models completely.
+    """
+    if gemini_client is None:
+        raise RuntimeError("GEMINI_API_KEY is not configured.")
+
+    print(f"✨ [{filename}] Sending image directly to Gemini Vision...")
+    start = time.perf_counter()
+
+    # Ensure image is in PIL format
+    if not isinstance(image, Image.Image):
+        if hasattr(image, "shape"): # numpy array
+            image = Image.fromarray(image)
+        else:
+            raise ValueError(f"Unsupported image type: {type(image)}")
+
+    user_instruction = (
+        "Extract the complete financial document from this receipt/invoice image.\n"
+        "Ensure all line items, totals, dates, taxes, and merchant details are captured.\n"
+        "IMPORTANT: 'line_items' MUST be a JSON array directly."
+    )
+
+    last_error = None
+    for attempt in range(1, GEMINI_MAX_RETRIES + 1):
+        try:
+            print(f"✨ Gemini Vision attempt {attempt}/{GEMINI_MAX_RETRIES}")
+            response = gemini_client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=[
+                    f"SYSTEM INSTRUCTIONS:\n{system_prompt}",
+                    user_instruction,
+                    image,
+                ],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=_gemini_compatible_schema(FINANCIAL_JSON_SCHEMA),
+                ),
+            )
+
+            raw = response.text if response else None
+            if not raw or not raw.strip():
+                raise RuntimeError("Gemini Vision returned empty response.")
+
+            parsed = json.loads(raw.strip())
+            if not isinstance(parsed.get("line_items"), list):
+                raise ValueError(
+                    "Expected list for line_items, "
+                    f"got {type(parsed.get('line_items')).__name__}"
+                )
+
+            parsed["source_file"] = filename
+            parsed["raw_ocr_text_reference"] = "Extracted directly via Gemini Multimodal Vision"
+            parsed = validate_financial_data(remove_duplicate_line_items(parsed))
+
+            print(
+                f"✅ [{filename}] Gemini Vision completed in "
+                f"{time.perf_counter() - start:.2f}s | "
+                f"Status: {parsed['validation']['status']}"
+            )
+            return parsed
+
+        except Exception as exc:
+            last_error = exc
+            print(f"❌ Gemini Vision attempt {attempt} failed: {type(exc).__name__}: {exc}")
+            if attempt < GEMINI_MAX_RETRIES:
+                _sleep_for_retry(exc, attempt)
+
+    print(f"❌ Gemini Vision failed for {filename}: {last_error}")
+    return None
+
+
 def parse_with_gemini(
     filename,
     receipt_text,
@@ -580,7 +657,7 @@ def load_and_optimize_image(image_path, max_width=MAX_IMAGE_WIDTH):
             img = img.convert("RGB")
             if img.width > max_width:
                 img = img.resize((max_width, int(img.height * (max_width / img.width))), Image.Resampling.LANCZOS)
-            return np.array(img)
+            return img.copy()
     except Exception as e:
         print(f"❌ Image load failed {image_path}: {e}")
         return None

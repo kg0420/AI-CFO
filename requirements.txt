@@ -16,7 +16,4 @@ groq
 python-dotenv
 google-genai
 
-paddlepaddle==3.3.1
-paddleocr
-
 gunicorn

@@ -6,26 +6,14 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
-load_dotenv()
-# ============================================================
-# PERFORMANCE CONFIGURATION
-# IMPORTANT: These environment variables must be set BEFORE 
-# importing PaddleOCR/PaddlePaddle.
-# ============================================================
-os.environ["PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT"] = "0"
-os.environ["FLAGS_use_mkldnn"] = "0"
-os.environ["OMP_NUM_THREADS"] = "4"
-os.environ["MKL_NUM_THREADS"] = "4"
 
-from paddleocr import PaddleOCR
+load_dotenv()
 
 from financial_config import DEFAULT_SYSTEM_PROMPT, MAX_GROQ_WORKERS
 from financial_processor import (
     calculate_file_hash,
-    extract_text_fast,
     load_and_optimize_image,
-    parse_with_llm,
-    recheck_with_llm,
+    parse_image_with_gemini_vision,
     save_batch_results,
 )
 
@@ -35,27 +23,10 @@ from financial_processor import (
 TEMP_ROOT = Path("temp") / "requests"
 
 # ============================================================
-# PADDLEOCR INITIALIZATION
-# ============================================================
-print("🚀 Initializing PaddleOCR...")
-ocr = PaddleOCR(
-    lang="en",
-    use_doc_orientation_classify=False,
-    use_doc_unwarping=False,
-    use_textline_orientation=False,
-    text_detection_model_name="PP-OCRv5_mobile_det",
-    text_recognition_model_name="PP-OCRv5_mobile_rec",
-    enable_mkldnn=False,       # turn CPU acceleration back on
-    cpu_threads=4,
-    enable_hpi=False,
-)
-print("✅ PaddleOCR initialized")
-
-# ============================================================
 # REQUEST MANAGEMENT
 # ============================================================
 def create_request_id():
-    """Create a unique request ID for each extraction request (e.g., 20260819_130500_a81f3c42)."""
+    """Create a unique request ID for each extraction request."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     short_id = uuid.uuid4().hex[:8]
     return f"{timestamp}_{short_id}"
@@ -67,18 +38,10 @@ def create_request_directory(request_id):
     return request_dir
 
 # ============================================================
-# TEMPORARY OCR STORAGE
+# TEMPORARY LOGGING & STORAGE
 # ============================================================
-def save_temp_ocr_text(request_dir, filename, ocr_text):
-    """Save OCR text temporarily for the current request."""
-    ocr_path = request_dir / "ocr.txt"
-    with open(ocr_path, "a", encoding="utf-8") as file:
-        file.write(f"\n\n===== {filename} =====\n\n")
-        file.write(ocr_text)
-    return ocr_path
-
 def save_temp_extraction(request_dir, filename, result):
-    """Save the intermediate Groq extraction temporarily."""
+    """Save the intermediate extraction temporarily."""
     safe_filename = Path(filename).stem
     extraction_path = request_dir / f"{safe_filename}_extracted.json"
     with open(extraction_path, "w", encoding="utf-8") as file:
@@ -97,12 +60,13 @@ def save_request_status(request_dir, status, message=None):
     return status_path
 
 # ============================================================
-# MAIN BATCH PROCESSOR
+# MAIN BATCH PROCESSOR (GEMINI MULTIMODAL VISION)
 # ============================================================
 def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT, progress_callback=None):
     """
-    Process multiple financial documents.
-    Pipeline: Image -> Optimize -> PaddleOCR -> Temp OCR text -> Multi-LLM -> Validation -> Correction -> DB
+    Process multiple financial documents directly using Gemini Multimodal Vision.
+    Zero heavy local OCR memory footprint - ideal for Render cloud deployments.
+    Pipeline: Image -> Optimize -> Gemini Vision -> Validation -> DB
     """
     overall_start = time.perf_counter()
 
@@ -114,7 +78,7 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT, progress_
 
     print("\n" + "=" * 70)
     print(f"🆔 Request ID: {request_id}")
-    print(f"🚀 Processing {len(image_paths)} image(s)")
+    print(f"🚀 Processing {len(image_paths)} image(s) via Gemini Multimodal Vision")
     print("=" * 70)
 
     save_request_status(request_dir, "STARTED")
@@ -124,14 +88,14 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT, progress_
             "step": "prep",
             "message": f"Pre-processing and optimizing {len(image_paths)} receipt images...",
             "total": len(image_paths),
-            "percent": 10
+            "percent": 15
         })
 
     # ========================================================
     # STEP 1 — IMAGE PREPARATION
     # ========================================================
     image_start = time.perf_counter()
-    valid_paths, images, file_hashes = [], [], {}
+    valid_items = []
 
     for path in image_paths:
         if not os.path.exists(path):
@@ -142,174 +106,59 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT, progress_
         if image is None:
             continue
 
-        valid_paths.append(path)
-        images.append(image)
-        
         filename = os.path.basename(path)
-        file_hashes[filename] = calculate_file_hash(path)
+        file_hash = calculate_file_hash(path)
+        valid_items.append((path, filename, image, file_hash))
 
     image_time = time.perf_counter() - image_start
     print(f"⚡ Image preparation: {image_time:.2f}s")
 
-    if not images:
+    if not valid_items:
         print("❌ No valid images.")
         save_request_status(request_dir, "FAILED", "No valid images found.")
         return []
 
     # ========================================================
-    # STEP 2 — BATCH OCR
+    # STEP 2 — GEMINI VISION MULTIMODAL EXTRACTION
     # ========================================================
-    ocr_start = time.perf_counter()
-    print("\n🔎 Running PaddleOCR batch inference...")
-
-    if progress_callback:
-        progress_callback({
-            "step": "ocr_batch",
-            "message": f"Running PaddleOCR engine across {len(images)} documents...",
-            "total": len(images),
-            "percent": 25,
-        })
-
-    try:
-        ocr_results = list(ocr.predict(images))
-    except Exception as exc:
-        print(f"❌ PaddleOCR failed: {exc}")
-        save_request_status(request_dir, "OCR_FAILED", str(exc))
-        return []
-
-    ocr_time = time.perf_counter() - ocr_start
-    print(f"⚡ OCR completed: {ocr_time:.2f}s")
-
-    # ========================================================
-    # STEP 3 — OCR TEXT EXTRACTION
-    # ========================================================
-    image_texts = []
-    
-    for idx, result in enumerate(ocr_results):
-        if idx >= len(valid_paths):
-            break
-
-        filename = os.path.basename(valid_paths[idx])
-        
-        try:
-            receipt_text = "\n".join(extract_text_fast([result]))
-            if not receipt_text.strip():
-                print(f"⚠️ No text found: {filename}")
-                continue
-
-            # Save OCR immediately
-            save_temp_ocr_text(request_dir, filename, receipt_text)
-            
-            image_texts.append((filename, receipt_text, file_hashes.get(filename)))
-            print(f"📝 {filename}: {len(receipt_text)} characters")
-            print(f"🔍 [{request_id}] OCR lines: {len(receipt_text.splitlines())}")
-
-            if progress_callback:
-                progress_callback({
-                    "step": "ocr_item",
-                    "filename": filename,
-                    "lines": len(receipt_text.splitlines()),
-                    "index": idx + 1,
-                    "total": len(valid_paths),
-                    "message": f"Scanned text from {filename} ({len(receipt_text.splitlines())} lines)",
-                    "percent": 25 + int(((idx + 1) / len(valid_paths)) * 25),
-                })
-
-        except Exception as exc:
-            print(f"❌ Text extraction failed for {filename}: {exc}")
-
-    if not image_texts:
-        print("❌ No OCR text extracted.")
-        save_request_status(request_dir, "OCR_EMPTY", "No OCR text was extracted.")
-        return []
-
-    # ========================================================
-    # STEP 4 — MULTI-LLM EXTRACTION
-    # ========================================================
-    llm_start = time.perf_counter()
-    print("\n🤖 Running multi-LLM extraction in parallel...")
-    print("   🔀 Routing receipts between Gemini and Groq")
-    print("   🛡️ Automatic fallback enabled if one provider fails")
+    vision_start = time.perf_counter()
+    print("\n🤖 Running Gemini Multimodal Vision extraction in parallel...")
 
     if progress_callback:
         progress_callback({
             "step": "llm_batch",
-            "message": f"Running parallel AI extraction on {len(image_texts)} documents...",
-            "total": len(image_texts),
-            "percent": 55,
+            "message": f"Extracting financial details via Gemini Vision on {len(valid_items)} documents...",
+            "total": len(valid_items),
+            "percent": 35,
         })
 
     final_results = []
-    max_workers = min(MAX_GROQ_WORKERS, len(image_texts))
+    max_workers = min(MAX_GROQ_WORKERS, len(valid_items))
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_map = {}
 
-        for index, (filename, receipt_text, file_hash) in enumerate(image_texts):
-            preferred_provider = "gemini" if index % 2 == 0 else "groq"
-
+        for _, filename, image, file_hash in valid_items:
             future = executor.submit(
-                parse_with_llm,
+                parse_image_with_gemini_vision,
                 filename,
-                receipt_text,
+                image,
                 system_prompt,
-                preferred_provider,
             )
-
-            future_map[future] = (
-                filename,
-                receipt_text,
-                file_hash,
-                preferred_provider,
-            )
+            future_map[future] = (filename, file_hash)
 
         for future in as_completed(future_map):
-            filename, receipt_text, file_hash, preferred_provider = future_map[future]
+            filename, file_hash = future_map[future]
 
             try:
-                print(
-                    f"🤖 [{request_id}] Processing {filename} "
-                    f"(preferred: {preferred_provider})"
-                )
-
                 result = future.result()
 
                 if result is None:
-                    print(f"⚠️ All LLM providers failed for {filename}")
+                    print(f"⚠️ Gemini Vision failed for {filename}")
                     continue
 
                 result["document_hash"] = file_hash
-
-                # Save intermediate extraction immediately.
                 save_temp_extraction(request_dir, filename, result)
-
-                # ------------------------------------------------
-                # SECOND PASS — CORRECTION
-                # ------------------------------------------------
-                validation_status = result.get("validation", {}).get("status")
-
-                if validation_status == "REVIEW_REQUIRED":
-                    correction_provider = (
-                        "groq" if preferred_provider == "gemini" else "gemini"
-                    )
-
-                    print(
-                        f"🔄 [{request_id}] Running correction for {filename} "
-                        f"(preferred: {correction_provider})"
-                    )
-
-                    corrected = recheck_with_llm(
-                        filename,
-                        receipt_text,
-                        result,
-                        correction_provider,
-                    )
-
-                    if corrected:
-                        corrected["document_hash"] = file_hash
-                        result = corrected
-                        save_temp_extraction(request_dir, filename, result)
-
                 final_results.append(result)
 
                 seller = result.get("seller_details", {})
@@ -336,42 +185,37 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT, progress_
                         "category": category,
                         "status": result.get("validation", {}).get("status", "VALID"),
                         "index": len(final_results),
-                        "total": len(image_texts),
+                        "total": len(valid_items),
                         "message": f"Extracted: {merchant_name} · ₹{grand_total:,.2f}",
-                        "percent": 55 + int((len(final_results) / len(image_texts)) * 40),
+                        "percent": 35 + int((len(final_results) / len(valid_items)) * 55),
                     })
 
             except Exception as exc:
-                print(
-                    f"❌ Worker error {filename}: "
-                    f"{type(exc).__name__}: {exc}"
-                )
+                print(f"❌ Worker error {filename}: {type(exc).__name__}: {exc}")
 
-    llm_time = time.perf_counter() - llm_start
-    print(f"⚡ Multi-LLM processing: {llm_time:.2f}s")
+    vision_time = time.perf_counter() - vision_start
+    print(f"⚡ Gemini Vision processing: {vision_time:.2f}s")
 
     # ========================================================
-    # STEP 5 — SAVE PERMANENT DATABASE
+    # STEP 3 — SAVE PERMANENT DATABASE
     # ========================================================
     save_start = time.perf_counter()
-    
     if final_results:
         save_batch_results(final_results)
-        
     save_time = time.perf_counter() - save_start
     print(f"💾 Database save: {save_time:.2f}s")
 
     # ========================================================
-    # STEP 6 — SUMMARY
+    # STEP 4 — SUMMARY
     # ========================================================
     total_time = time.perf_counter() - overall_start
-    
+
     valid_count = sum(1 for res in final_results if res.get("validation", {}).get("status") == "VALID")
     review_count = sum(1 for res in final_results if res.get("validation", {}).get("status") == "REVIEW_REQUIRED")
     unknown_count = len(final_results) - valid_count - review_count
 
     print("\n" + "=" * 70)
-    print("✅ BATCH COMPLETE")
+    print("✅ BATCH COMPLETE (Gemini Vision)")
     print("=" * 70)
     print(f"Request ID      : {request_id}")
     print(f"Images received : {len(image_paths)}")
@@ -379,24 +223,16 @@ def process_invoices(image_paths, system_prompt=DEFAULT_SYSTEM_PROMPT, progress_
     print(f"Valid documents : {valid_count}")
     print(f"Needs review    : {review_count}")
     print(f"Unknown status  : {unknown_count}")
-    print(f"OCR time        : {ocr_time:.2f}s")
-    print(f"LLM time       : {llm_time:.2f}s")
+    print(f"Vision time     : {vision_time:.2f}s")
     print(f"Save time       : {save_time:.2f}s")
     print(f"TOTAL TIME      : {total_time:.2f}s")
     print(f"Temporary data  : {request_dir}")
     print("=" * 70)
 
     if final_results:
-        save_request_status(
-            request_dir,
-            "COMPLETED"
-        )
+        save_request_status(request_dir, "COMPLETED")
     else:
-        save_request_status(
-            request_dir,
-            "FAILED",
-            "OCR completed but all configured LLM providers failed."
-        )
+        save_request_status(request_dir, "FAILED", "Vision processing failed for all documents.")
 
     return final_results
 
@@ -428,7 +264,7 @@ __all__ = [
 # DIRECT TEST
 # ============================================================
 if __name__ == "__main__":
-    test_images = [] # e.g., ["invoices/invoice1.jpg", "invoices/invoice2.jpg"]
+    test_images = ["receipt.jpeg"] if os.path.exists("receipt.jpeg") else []
 
     if test_images:
         results = process_invoices(test_images)
